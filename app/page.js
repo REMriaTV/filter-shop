@@ -100,17 +100,7 @@ export default function Home() {
   }, []);
 
   return (
-    // ★変更箇所：フィルターを 0.4 -> 0.2 に変更（より画像を鮮明に）
-    <main style={{ 
-      minHeight: "100vh", 
-      padding: "20px", 
-      color: "#fff",
-      // 黒(0.2)のフィルター + 画像
-      backgroundImage: `linear-gradient(rgba(0,0,0,0.2), rgba(0,0,0,0.2)), url('/undergroundworld.jpg')`,
-      backgroundSize: 'cover',
-      backgroundPosition: 'center',
-      backgroundAttachment: 'fixed'
-    }}>
+ <main style={{ backgroundColor: "#111", minHeight: "100vh", padding: "20px", color: "#fff" }}>
       <style jsx global>{`
         /* アニメーション定義 */
         @keyframes screenOn {
