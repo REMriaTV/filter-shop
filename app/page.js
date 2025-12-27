@@ -16,12 +16,10 @@ const Monitor = ({ videoId, index }) => {
   useEffect(() => {
     setIsClient(true);
     setConfig({
-      // 再生開始位置をズラす（0〜600秒）
+      // 再生開始位置をズラす
       startTime: Math.floor(Math.random() * 600),
-      
-      // 時間差の上限は「12秒」
+      // 時間差の上限12秒
       delay: Math.random() * 12,
-      
       origin: window.location.origin
     });
   }, []);
@@ -29,21 +27,19 @@ const Monitor = ({ videoId, index }) => {
   if (!isClient) return <div style={styles.monitorFrame} />;
 
   return (
-    // スマホで2列にするために "mobile-monitor" というクラス名が付いています
     <div style={styles.monitorFrame} className="mobile-monitor">
-      <div style={styles.screen}>
+      {/* ★スマホ対応修正：ここにクラス名 "monitor-screen" を追加しました */}
+      <div style={styles.screen} className="monitor-screen">
         {config.origin && (
           <iframe
             width="100%"
             height="100%"
-            // スマホ自動再生対策 playsinline=1
             src={`https://www.youtube.com/embed/${videoId}?controls=0&modestbranding=1&autoplay=1&mute=1&loop=1&playlist=${videoId}&start=${config.startTime}&origin=${config.origin}&playsinline=1`}
             title={`Monitor-${index}`}
             frameBorder="0"
             allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
             style={{ 
               pointerEvents: "auto",
-              // 中身（映像）だけが遅れてつく演出
               opacity: 0, 
               animation: `screenOn 0.2s ease-out forwards`, 
               animationDelay: `${config.delay}s` 
@@ -94,13 +90,18 @@ export default function Home() {
   const [shuffledList, setShuffledList] = useState([]);
 
   useEffect(() => {
-    // ランダム配置
     const list = [...rawVideoIds].sort(() => Math.random() - 0.5);
     setShuffledList(list);
   }, []);
 
   return (
- <main style={{ backgroundColor: "#111", minHeight: "100vh", padding: "20px", color: "#fff" }}>
+    // ★修正：背景画像を削除し、シンプルな黒(#111)に戻しました
+    <main style={{ 
+      backgroundColor: "#111", // ←ここを変更
+      minHeight: "100vh", 
+      padding: "20px", 
+      color: "#fff",
+    }}>
       <style jsx global>{`
         /* アニメーション定義 */
         @keyframes screenOn {
@@ -113,13 +114,18 @@ export default function Home() {
         /* スマホ縦2列のためのスタイル調整 */
         @media (max-width: 768px) {
           .mobile-monitor {
-            /* 強制的に幅を縮めて2列入るようにする */
             width: 46% !important; 
             height: auto !important;
-            aspect-ratio: 4/3; /* 比率は維持 */
+            aspect-ratio: 4/3;
             padding: 8px !important;
           }
-          /* ギャップも少し詰める */
+          /* ★スマホ対応修正：画面の中身も比率を保つように強制 */
+          .monitor-screen {
+            height: auto !important; 
+            aspect-ratio: 4/3;
+            width: 100% !important;
+          }
+
           .monitor-container {
             gap: 10px !important;
           }
@@ -164,7 +170,7 @@ const styles = {
   },
   screen: {
     width: "100%",
-    height: "180px",
+    height: "180px", // デフォルト（PC）ではこの高さを使う
     background: "#000",
     borderRadius: "40% 40% 40% 40% / 10% 10% 10% 10%",
     overflow: "hidden",
