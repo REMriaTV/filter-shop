@@ -1,45 +1,30 @@
 // app/story/page.js
 import Link from 'next/link';
+import styles from './story.module.css'; // ← CSSファイルを読み込み
 
 export default function Story() {
   return (
     <main style={{ 
-      backgroundColor: "#080808", // 限りなく黒に近いグレー
+      backgroundColor: "#080808",
       minHeight: "100vh", 
       color: "#ccc", 
-      fontFamily: "'Yu Mincho', 'Hiragino Mincho ProN', serif", // 明朝体
-      overflowX: "hidden", // 横スクロール防止
+      fontFamily: "'Yu Mincho', 'Hiragino Mincho ProN', serif",
+      overflowX: "hidden",
       position: "relative"
     }}>
       
-      {/* 閉じるボタン（現実に戻る） */}
+      {/* 閉じるボタン */}
       <div style={{ position: "fixed", top: "30px", right: "30px", zIndex: 10 }}>
         <Link href="/" style={{ textDecoration: "none", color: "#444", fontSize: "0.8rem", letterSpacing: "0.1em" }}>
           × 喫煙終了
         </Link>
       </div>
 
-      {/* 小説本文エリア */}
-      <div style={{ 
-        padding: "80px 40px", 
-        maxWidth: "800px", 
-        margin: "0 auto", 
-        minHeight: "80vh",
-        display: "flex",
-        justifyContent: "center",
-        alignItems: "flex-start" 
-      }}>
+      {/* 小説本文エリア：CSS Modulesのクラスを適用 */}
+      <div className={styles.container}>
         
-        {/* 縦書きのコンテナ */}
-        <article style={{ 
-          writingMode: "vertical-rl", // 縦書き設定
-          textOrientation: "upright", 
-          fontSize: "1.1rem", 
-          lineHeight: "2.2", 
-          letterSpacing: "0.15em",
-          height: "auto",
-          textAlign: "justify"
-        }}>
+        {/* 縦書きのコンテナ：CSS Modulesのクラスを適用 */}
+        <article className={styles.article}>
           
           <h1 style={{ fontSize: "1.8rem", margin: "0 0 60px 40px", color: "#fff" }}>
             煙の行方
@@ -67,7 +52,7 @@ export default function Story() {
 
       </div>
 
-      {/* 雰囲気作りのための「煙」のような装飾（CSSだけで表現） */}
+      {/* 雰囲気作りのための「煙」のような装飾 */}
       <div style={{
         position: "fixed",
         bottom: 0,
