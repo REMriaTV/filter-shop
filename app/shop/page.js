@@ -18,27 +18,22 @@ export default function Shop() {
           
           {/* 写真エリア */}
           <div style={{ flex: "1 1 350px", display: "flex", justifyContent: "center" }}>
-  <img 
-    src="/white_001.jpg"  /* ←さっき入れたファイル名 */
-    alt="しろいぼう"
-    style={{ 
-      width: "100%", 
-      maxWidth: "400px", 
-      height: "auto", 
-      objectFit: "contain",
-  // 修正後
-boxShadow: "0 20px 50px rgba(0,0,0,0.5)"
-    }} 
-  />
-</div>
+            <img 
+              src="/white_001.jpg"
+              alt="しろいぼう"
+              style={{ 
+                width: "100%", 
+                maxWidth: "400px", 
+                height: "auto", 
+                objectFit: "contain",
+                boxShadow: "0 20px 50px rgba(0,0,0,0.5)"
+              }} 
+            />
+          </div>
 
-
-
-
-          {/* ★追記箇所：ここから商品説明エリアの開始タグ（レイアウト調整用のflex設定も追加） */}
+          {/* 商品説明エリア */}
           <div style={{ flex: "1 1 300px" }}>
 
-            {/* 商品説明エリア */}
             <Link href="/story" style={{ textDecoration: "none" }}>
               <h1 style={{ fontSize: "2.5rem", marginBottom: "10px", letterSpacing: "0.15em", fontWeight: "normal", color: "#fff", cursor: "pointer" }}>
                 The Draft
@@ -51,23 +46,28 @@ boxShadow: "0 20px 50px rgba(0,0,0,0.5)"
             </div>
 
             <div style={{ marginBottom: "40px" }}>
-              <button style={{ 
-                background: "transparent", 
-                border: "1px solid #888", 
-                color: "#fff", 
-                padding: "15px 40px", 
-                cursor: "pointer",
-                fontFamily: "serif",
-                fontSize: "1rem",
-                letterSpacing: "0.1em",
-                transition: "0.3s"
-              }}>
-                手に入れる
-              </button>
+              {/* ▼▼▼ ここがメール機能の部分です ▼▼▼ */}
+              <a href="mailto:remuriatv@gmail.com?subject=The Draft 購入希望&body=制作主の気分はいかがですか？在庫があれば譲ってください。">
+                <button style={{ 
+                  background: "transparent", 
+                  border: "1px solid #888", 
+                  color: "#fff", 
+                  padding: "15px 40px", 
+                  cursor: "pointer",
+                  fontFamily: "serif",
+                  fontSize: "1rem",
+                  letterSpacing: "0.1em",
+                  transition: "0.3s"
+                }}>
+                  手に入れる
+                </button>
+              </a>
+              {/* ▲▲▲ ここまで ▲▲▲ */}
+              
               <p style={{ marginTop: "15px", fontSize: "0.7rem", color: "#444" }}>※在庫状況：制作主の気分別</p>
             </div>
             
-          </div> {/* ★ここで閉じタグが効くようになります */}
+          </div>
           
         </section>
 
