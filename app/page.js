@@ -4,7 +4,7 @@
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
 
-// --- 1. 個別のモニターコンポーネント ---
+// --- 1. 個別のモニターコンポーネント（変更なし） ---
 const Monitor = ({ videoId, index }) => {
   const [isClient, setIsClient] = useState(false);
   const [config, setConfig] = useState({ 
@@ -26,7 +26,6 @@ const Monitor = ({ videoId, index }) => {
 
   return (
     <div style={styles.monitorFrame} className="mobile-monitor">
-      {/* ★修正1：スマホでの高さ固定解除のため className="mobile-screen" を追加 */}
       <div style={styles.screen} className="mobile-screen">
         {config.origin && (
           <iframe
@@ -47,8 +46,7 @@ const Monitor = ({ videoId, index }) => {
         <div style={styles.scanline}></div>
       </div>
       
-      {/* ランプ */}
-      <div style={{ marginTop: "5px", display: "flex", justifyContent: "space-between", fontSize: "10px", color: "#444" }}>
+      <div className="monitor-label" style={{ marginTop: "5px", display: "flex", justifyContent: "space-between", fontSize: "10px", color: "#444" }}>
         <span>SONY</span>
         <span 
           style={{ 
@@ -70,18 +68,9 @@ const Monitor = ({ videoId, index }) => {
 // --- 2. メインページ ---
 export default function Home() {
   const rawVideoIds = [
-    "L_LUpnjgPso", 
-    "L_LUpnjgPso",
-    "L_LUpnjgPso",
-    "L_LUpnjgPso",
-    "q76bMs-NwRk", 
-    "q76bMs-NwRk",
-    "q76bMs-NwRk",
-    "q76bMs-NwRk",
-    "jn4lNAfwD0g", 
-    "jn4lNAfwD0g",
-    "jn4lNAfwD0g",
-    "jn4lNAfwD0g",
+    "L_LUpnjgPso", "L_LUpnjgPso", "L_LUpnjgPso", "L_LUpnjgPso",
+    "q76bMs-NwRk", "q76bMs-NwRk", "q76bMs-NwRk", "q76bMs-NwRk",
+    "jn4lNAfwD0g", "jn4lNAfwD0g", "jn4lNAfwD0g", "jn4lNAfwD0g",
   ];
 
   const [shuffledList, setShuffledList] = useState([]);
@@ -92,12 +81,8 @@ export default function Home() {
   }, []);
 
   return (
-    <main style={{ 
-      minHeight: "100vh", 
-      padding: "20px", 
-      color: "#fff",
-      backgroundColor: "#000"
-    }}>
+    // ★修正1：背景色を #111 から #000 に変更
+    <main style={{ backgroundColor: "#000", minHeight: "100vh", padding: "20px", color: "#fff" }}>
       <style jsx global>{`
         @keyframes screenOn {
           0% { opacity: 0; filter: brightness(0); }
@@ -106,38 +91,68 @@ export default function Home() {
         }
         @keyframes lampOn { from { opacity: 0; } to { opacity: 1; } }
 
+        /* ★修正2：モバイルレイアウトの修正を適用 */
         @media (max-width: 768px) {
+          .monitor-container { 
+            gap: 10px !important; 
+          }
           .mobile-monitor {
+            /* 48%だと崩れるため46%に変更 */
             width: 46% !important; 
+            padding: 8px !important; 
+            border-radius: 10px !important; 
+            aspect-ratio: 4/3; /* アスペクト比修正 */
             height: auto !important;
-            aspect-ratio: 4/3; 
-            padding: 8px !important;
           }
-          
-          /* ★修正2：中のスクリーンも固定pxを解除して比率でリサイズする */
-          .mobile-screen {
-            height: auto !important;
-            aspect-ratio: 16/11 !important; /* 枠内に収まるように調整 */
+          .mobile-screen { 
+            /* 高さ固定を解除し、比率で制御 */
+            height: auto !important; 
+            aspect-ratio: 16/11 !important;
             width: 100% !important;
+            border-radius: 4px !important; 
           }
-
-          .monitor-container {
-            gap: 10px !important;
+          .monitor-label { 
+            margin-top: 4px !important; 
+            font-size: 9px !important; 
           }
         }
       `}</style>
 
       <h1 style={{ textAlign: "center", fontFamily: "monospace", opacity: 0.5, marginBottom: "40px" }}>Filter</h1>
       
-      <div 
-        className="monitor-container" 
-        style={{ display: "flex", flexWrap: "wrap", gap: "20px", justifyContent: "center" }}
-      >
+      <div className="monitor-container" style={{ display: "flex", flexWrap: "wrap", gap: "20px", justifyContent: "center" }}>
         {shuffledList.map((id, index) => (
           <Monitor key={`${id}-${index}`} videoId={id} index={index} />
         ))}
       </div>
 
+      {/* 左下のフロアガイド（最新コードのリンク構造を維持） */}
+      <div style={{ position: "fixed", bottom: "20px", left: "20px", zIndex: 100, fontFamily: "monospace", fontSize: "12px", color: "#666", lineHeight: "1.5" }}>
+        <div style={{ marginBottom: "5px", borderBottom: "1px solid #333", paddingBottom: "2px" }}>FLOOR GUIDE</div>
+        <div style={{ color: "#fff" }}>1F : MAIN HALL &lt;</div>
+        
+        <Link href="/aisle/nature">
+          <div style={{ opacity: 0.5, cursor: "pointer", transition: "opacity 0.2s" }} onMouseOver={(e) => e.target.style.opacity = 1} onMouseOut={(e) => e.target.style.opacity = 0.5}>
+            B1 : NATURE
+          </div>
+        </Link>
+        
+        <Link href="/aisle/cyber">
+          <div style={{ opacity: 0.5, cursor: "pointer", transition: "opacity 0.2s" }} onMouseOver={(e) => e.target.style.opacity = 1} onMouseOut={(e) => e.target.style.opacity = 0.5}>
+            B2 : CYBER CITY
+          </div>
+        </Link>
+
+        <Link href="/backroom">
+          <div style={{ marginTop: "8px", opacity: 0.3, cursor: "pointer", transition: "opacity 0.2s" }} 
+               onMouseOver={(e) => e.target.style.opacity = 1} 
+               onMouseOut={(e) => e.target.style.opacity = 0.3}>
+            B9 : STAFF ONLY [LOCK]
+          </div>
+        </Link>
+      </div>
+
+      {/* 右下の売店（変更なし） */}
       <Link href="/shop">
         <div style={{ position: "fixed", bottom: "20px", right: "20px", cursor: "pointer", zIndex: 100 }}>
           <div style={{ border: "1px solid #555", padding: "10px", background: "#000", fontFamily: "serif", color: "#fff" }}>
@@ -149,7 +164,7 @@ export default function Home() {
   );
 }
 
-// --- 3. スタイル定義 ---
+// --- 3. スタイル定義（変更なし） ---
 const styles = {
   monitorFrame: {
     width: "300px",
@@ -163,7 +178,7 @@ const styles = {
   },
   screen: {
     width: "100%",
-    height: "180px", // ←ここの固定値がモバイルで悪さをしていました
+    height: "180px",
     background: "#000",
     borderRadius: "40% 40% 40% 40% / 10% 10% 10% 10%",
     overflow: "hidden",
