@@ -17,18 +17,23 @@ export default function Shop() {
         <section style={{ display: "flex", gap: "60px", flexWrap: "wrap", alignItems: "center" }}>
           
           {/* 写真エリア */}
-          <div style={{ 
-            flex: "1 1 350px", 
-            height: "450px", 
-            backgroundColor: "#111", 
-            border: "1px solid #222",
-            display: "flex", 
-            alignItems: "center", 
-            justifyContent: "center",
-            boxShadow: "0 20px 50px rgba(0,0,0,0.5)"
-          }}>
-            <span style={{ color: "#333", fontStyle: "italic", fontFamily: "serif" }}>Product Photography</span>
-          </div>
+          <div style={{ flex: "1 1 350px", display: "flex", justifyContent: "center" }}>
+  <img 
+    src="/white_001.jpg"  /* ←さっき入れたファイル名 */
+    alt="しろいぼう"
+    style={{ 
+      width: "100%", 
+      maxWidth: "400px", 
+      height: "auto", 
+      objectFit: "contain",
+  // 修正後
+boxShadow: "0 20px 50px rgba(0,0,0,0.5)"
+    }} 
+  />
+</div>
+
+
+
 
           {/* ★追記箇所：ここから商品説明エリアの開始タグ（レイアウト調整用のflex設定も追加） */}
           <div style={{ flex: "1 1 300px" }}>
