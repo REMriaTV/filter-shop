@@ -16,8 +16,12 @@ const Monitor = ({ videoId, index }) => {
   useEffect(() => {
     setIsClient(true);
     setConfig({
+      // 再生開始位置をズラす（0〜600秒）
       startTime: Math.floor(Math.random() * 600),
-      delay: Math.random() * 12, // 時間差12秒
+      
+      // 時間差の上限は「12秒」
+      delay: Math.random() * 12,
+      
       origin: window.location.origin
     });
   }, []);
@@ -25,29 +29,33 @@ const Monitor = ({ videoId, index }) => {
   if (!isClient) return <div style={styles.monitorFrame} />;
 
   return (
+    // スマホで2列にするために "mobile-monitor" というクラス名が付いています
     <div style={styles.monitorFrame} className="mobile-monitor">
-      <div style={styles.screen} className="mobile-screen">
+      <div style={styles.screen}>
         {config.origin && (
           <iframe
             width="100%"
             height="100%"
+            // スマホ自動再生対策 playsinline=1
             src={`https://www.youtube.com/embed/${videoId}?controls=0&modestbranding=1&autoplay=1&mute=1&loop=1&playlist=${videoId}&start=${config.startTime}&origin=${config.origin}&playsinline=1`}
             title={`Monitor-${index}`}
             frameBorder="0"
             allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
             style={{ 
               pointerEvents: "auto",
+              // 中身（映像）だけが遅れてつく演出
               opacity: 0, 
               animation: `screenOn 0.2s ease-out forwards`, 
               animationDelay: `${config.delay}s` 
             }}
           />
         )}
+        {/* 走査線 */}
         <div style={styles.scanline}></div>
       </div>
       
-      {/* ランプとロゴ（スマホでは少し小さく調整されます） */}
-      <div className="monitor-label" style={{ marginTop: "5px", display: "flex", justifyContent: "space-between", fontSize: "10px", color: "#444" }}>
+      {/* ランプ */}
+      <div style={{ marginTop: "5px", display: "flex", justifyContent: "space-between", fontSize: "10px", color: "#444" }}>
         <span>SONY</span>
         <span 
           style={{ 
@@ -86,14 +94,25 @@ export default function Home() {
   const [shuffledList, setShuffledList] = useState([]);
 
   useEffect(() => {
+    // ランダム配置
     const list = [...rawVideoIds].sort(() => Math.random() - 0.5);
     setShuffledList(list);
   }, []);
 
   return (
-    // ★変更箇所：背景画像を削除し、元の #111 に戻しました
-    <main style={{ backgroundColor: "#111", minHeight: "100vh", padding: "20px", color: "#fff" }}>
+    // ★変更箇所：フィルターを 0.4 -> 0.2 に変更（より画像を鮮明に）
+    <main style={{ 
+      minHeight: "100vh", 
+      padding: "20px", 
+      color: "#fff",
+      // 黒(0.2)のフィルター + 画像
+      backgroundImage: `linear-gradient(rgba(0,0,0,0.2), rgba(0,0,0,0.2)), url('/undergroundworld.jpg')`,
+      backgroundSize: 'cover',
+      backgroundPosition: 'center',
+      backgroundAttachment: 'fixed'
+    }}>
       <style jsx global>{`
+        /* アニメーション定義 */
         @keyframes screenOn {
           0% { opacity: 0; filter: brightness(0); }
           50% { opacity: 1; filter: brightness(2); }
@@ -101,38 +120,26 @@ export default function Home() {
         }
         @keyframes lampOn { from { opacity: 0; } to { opacity: 1; } }
 
-        /* --- ★変更箇所：モバイル表示の最適化（8画面格納用） --- */
+        /* スマホ縦2列のためのスタイル調整 */
         @media (max-width: 768px) {
-          /* コンテナの隙間を極限まで詰める */
-          .monitor-container {
-            gap: 6px !important;
-          }
-          
-          /* モニター枠の圧縮 */
           .mobile-monitor {
-            width: 48% !important; /* 横並び2列 */
-            padding: 6px !important; /* 枠の厚みを減らす */
-            border-radius: 8px !important;
-            aspect-ratio: 16/10 !important; /* ★ここ重要：横長比率に固定して高さを抑える */
-            height: auto !important; /* 高さは比率にお任せ */
+            /* 強制的に幅を縮めて2列入るようにする */
+            width: 46% !important; 
+            height: auto !important;
+            aspect-ratio: 4/3; /* 比率は維持 */
+            padding: 8px !important;
           }
-
-          /* 画面内部の調整 */
-          .mobile-screen {
-            height: 80% !important; /* 文字スペースを残して画面を最大化 */
-            border-radius: 4px !important;
-          }
-
-          /* 文字を小さくしてスペース確保 */
-          .monitor-label {
-            margin-top: 3px !important;
-            font-size: 8px !important;
+          /* ギャップも少し詰める */
+          .monitor-container {
+            gap: 10px !important;
           }
         }
       `}</style>
 
+      {/* タイトル */}
       <h1 style={{ textAlign: "center", fontFamily: "monospace", opacity: 0.5, marginBottom: "40px" }}>Filter</h1>
       
+      {/* モニターの壁 */}
       <div 
         className="monitor-container" 
         style={{ display: "flex", flexWrap: "wrap", gap: "20px", justifyContent: "center" }}
@@ -153,7 +160,7 @@ export default function Home() {
   );
 }
 
-// --- 3. スタイル定義（変更なし） ---
+// --- 3. スタイル定義 ---
 const styles = {
   monitorFrame: {
     width: "300px",
