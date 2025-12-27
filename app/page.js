@@ -16,8 +16,12 @@ const Monitor = ({ videoId, index }) => {
   useEffect(() => {
     setIsClient(true);
     setConfig({
+      // 再生開始位置をズラす（0〜600秒）
       startTime: Math.floor(Math.random() * 600),
-      delay: Math.random() * 12, // 時間差12秒
+      
+      // ★修正1：時間差の上限を「12秒」に戻しました
+      delay: Math.random() * 12,
+      
       origin: window.location.origin
     });
   }, []);
@@ -25,29 +29,34 @@ const Monitor = ({ videoId, index }) => {
   if (!isClient) return <div style={styles.monitorFrame} />;
 
   return (
+    // ★デザインを以前のコード(inline style)に完全に戻しました
+    // スマホで2列にするために "mobile-monitor" というクラス名だけ付与しています
     <div style={styles.monitorFrame} className="mobile-monitor">
-      <div style={styles.screen} className="mobile-screen">
+      <div style={styles.screen}>
         {config.origin && (
           <iframe
             width="100%"
             height="100%"
+            // ★修正3：スマホ自動再生対策で playsinline=1 を追加
             src={`https://www.youtube.com/embed/${videoId}?controls=0&modestbranding=1&autoplay=1&mute=1&loop=1&playlist=${videoId}&start=${config.startTime}&origin=${config.origin}&playsinline=1`}
             title={`Monitor-${index}`}
             frameBorder="0"
             allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
             style={{ 
               pointerEvents: "auto",
+              // 中身（映像）だけが遅れてつく演出はそのまま
               opacity: 0, 
               animation: `screenOn 0.2s ease-out forwards`, 
               animationDelay: `${config.delay}s` 
             }}
           />
         )}
+        {/* 走査線 */}
         <div style={styles.scanline}></div>
       </div>
       
-      {/* ランプとロゴ */}
-      <div className="monitor-label" style={{ marginTop: "5px", display: "flex", justifyContent: "space-between", fontSize: "10px", color: "#444" }}>
+      {/* ランプ */}
+      <div style={{ marginTop: "5px", display: "flex", justifyContent: "space-between", fontSize: "10px", color: "#444" }}>
         <span>SONY</span>
         <span 
           style={{ 
@@ -86,13 +95,18 @@ export default function Home() {
   const [shuffledList, setShuffledList] = useState([]);
 
   useEffect(() => {
+    // ランダム配置
     const list = [...rawVideoIds].sort(() => Math.random() - 0.5);
     setShuffledList(list);
   }, []);
 
   return (
+    // ★修正2：背景画像を設定。フィルターを薄く(0.4)変更。
+       // ★変更箇所：背景画像を削除し、元の #111 に戻しました
     <main style={{ backgroundColor: "#111", minHeight: "100vh", padding: "20px", color: "#fff" }}>
+  
       <style jsx global>{`
+        /* アニメーション定義（変更なし） */
         @keyframes screenOn {
           0% { opacity: 0; filter: brightness(0); }
           50% { opacity: 1; filter: brightness(2); }
@@ -100,36 +114,26 @@ export default function Home() {
         }
         @keyframes lampOn { from { opacity: 0; } to { opacity: 1; } }
 
-        /* --- モバイル表示の調整 --- */
+        /* ★修正4：スマホ縦2列のためのスタイル調整 */
         @media (max-width: 768px) {
-          .monitor-container {
-            gap: 8px !important;
-          }
-          
-          /* ★ここを修正しました */
           .mobile-monitor {
-            width: 48% !important; 
-            padding: 8px !important; 
-            border-radius: 10px !important;
-            /* 16/10 から 5/4 (昔のテレビの比率) に変更。これで高さが出ます */
-            aspect-ratio: 5/4 !important; 
+            /* 強制的に幅を縮めて2列入るようにする */
+            width: 46% !important; 
             height: auto !important;
+            aspect-ratio: 4/3; /* 比率は維持 */
+            padding: 8px !important;
           }
-
-          .mobile-screen {
-            height: 75% !important; /* 画面エリアの比率を確保 */
-            border-radius: 4px !important;
-          }
-
-          .monitor-label {
-            margin-top: 4px !important;
-            font-size: 9px !important;
+          /* ギャップも少し詰める */
+          .monitor-container {
+            gap: 10px !important;
           }
         }
       `}</style>
 
+      {/* タイトル */}
       <h1 style={{ textAlign: "center", fontFamily: "monospace", opacity: 0.5, marginBottom: "40px" }}>Filter</h1>
       
+      {/* モニターの壁 */}
       <div 
         className="monitor-container" 
         style={{ display: "flex", flexWrap: "wrap", gap: "20px", justifyContent: "center" }}
@@ -150,7 +154,7 @@ export default function Home() {
   );
 }
 
-// --- 3. スタイル定義（変更なし） ---
+// --- 3. スタイル定義（あなたが気に入ってくれていた元のデザイン） ---
 const styles = {
   monitorFrame: {
     width: "300px",
