@@ -46,7 +46,7 @@ const Monitor = ({ videoId, index }) => {
         <div style={styles.scanline}></div>
       </div>
       
-      {/* ランプとロゴ（スマホでは少し小さく調整されます） */}
+      {/* ランプとロゴ */}
       <div className="monitor-label" style={{ marginTop: "5px", display: "flex", justifyContent: "space-between", fontSize: "10px", color: "#444" }}>
         <span>SONY</span>
         <span 
@@ -91,7 +91,6 @@ export default function Home() {
   }, []);
 
   return (
-    // ★変更箇所：背景画像を削除し、元の #111 に戻しました
     <main style={{ backgroundColor: "#111", minHeight: "100vh", padding: "20px", color: "#fff" }}>
       <style jsx global>{`
         @keyframes screenOn {
@@ -101,32 +100,30 @@ export default function Home() {
         }
         @keyframes lampOn { from { opacity: 0; } to { opacity: 1; } }
 
-        /* --- ★変更箇所：モバイル表示の最適化（8画面格納用） --- */
+        /* --- モバイル表示の調整 --- */
         @media (max-width: 768px) {
-          /* コンテナの隙間を極限まで詰める */
           .monitor-container {
-            gap: 6px !important;
+            gap: 8px !important;
           }
           
-          /* モニター枠の圧縮 */
+          /* ★ここを修正しました */
           .mobile-monitor {
-            width: 48% !important; /* 横並び2列 */
-            padding: 6px !important; /* 枠の厚みを減らす */
-            border-radius: 8px !important;
-            aspect-ratio: 16/10 !important; /* ★ここ重要：横長比率に固定して高さを抑える */
-            height: auto !important; /* 高さは比率にお任せ */
+            width: 48% !important; 
+            padding: 8px !important; 
+            border-radius: 10px !important;
+            /* 16/10 から 5/4 (昔のテレビの比率) に変更。これで高さが出ます */
+            aspect-ratio: 5/4 !important; 
+            height: auto !important;
           }
 
-          /* 画面内部の調整 */
           .mobile-screen {
-            height: 80% !important; /* 文字スペースを残して画面を最大化 */
+            height: 75% !important; /* 画面エリアの比率を確保 */
             border-radius: 4px !important;
           }
 
-          /* 文字を小さくしてスペース確保 */
           .monitor-label {
-            margin-top: 3px !important;
-            font-size: 8px !important;
+            margin-top: 4px !important;
+            font-size: 9px !important;
           }
         }
       `}</style>
