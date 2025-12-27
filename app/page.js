@@ -16,12 +16,8 @@ const Monitor = ({ videoId, index }) => {
   useEffect(() => {
     setIsClient(true);
     setConfig({
-      // 再生開始位置をズラす（0〜600秒）
       startTime: Math.floor(Math.random() * 600),
-      
-      // 時間差の上限12秒（変更なし）
       delay: Math.random() * 12,
-      
       origin: window.location.origin
     });
   }, []);
@@ -29,14 +25,13 @@ const Monitor = ({ videoId, index }) => {
   if (!isClient) return <div style={styles.monitorFrame} />;
 
   return (
-    // デザイン、モバイル用クラス設定（変更なし）
     <div style={styles.monitorFrame} className="mobile-monitor">
-      <div style={styles.screen}>
+      {/* ★修正1：スマホでの高さ固定解除のため className="mobile-screen" を追加 */}
+      <div style={styles.screen} className="mobile-screen">
         {config.origin && (
           <iframe
             width="100%"
             height="100%"
-            // playsinline=1 等の設定（変更なし）
             src={`https://www.youtube.com/embed/${videoId}?controls=0&modestbranding=1&autoplay=1&mute=1&loop=1&playlist=${videoId}&start=${config.startTime}&origin=${config.origin}&playsinline=1`}
             title={`Monitor-${index}`}
             frameBorder="0"
@@ -49,7 +44,6 @@ const Monitor = ({ videoId, index }) => {
             }}
           />
         )}
-        {/* 走査線 */}
         <div style={styles.scanline}></div>
       </div>
       
@@ -76,15 +70,15 @@ const Monitor = ({ videoId, index }) => {
 // --- 2. メインページ ---
 export default function Home() {
   const rawVideoIds = [
-    "L_LUpnjgPso", // 暖炉
+    "L_LUpnjgPso", 
     "L_LUpnjgPso",
     "L_LUpnjgPso",
     "L_LUpnjgPso",
-    "q76bMs-NwRk", // 雨音と暖炉
+    "q76bMs-NwRk", 
     "q76bMs-NwRk",
     "q76bMs-NwRk",
     "q76bMs-NwRk",
-    "jn4lNAfwD0g", // ダイビング
+    "jn4lNAfwD0g", 
     "jn4lNAfwD0g",
     "jn4lNAfwD0g",
     "jn4lNAfwD0g",
@@ -93,21 +87,18 @@ export default function Home() {
   const [shuffledList, setShuffledList] = useState([]);
 
   useEffect(() => {
-    // ランダム配置
     const list = [...rawVideoIds].sort(() => Math.random() - 0.5);
     setShuffledList(list);
   }, []);
 
   return (
-    // ★修正：背景画像を削除し、シンプルな黒背景に戻しました
     <main style={{ 
       minHeight: "100vh", 
       padding: "20px", 
       color: "#fff",
-      backgroundColor: "#000" // 画像指定を削除して黒を指定
+      backgroundColor: "#000"
     }}>
       <style jsx global>{`
-        /* アニメーション定義（変更なし） */
         @keyframes screenOn {
           0% { opacity: 0; filter: brightness(0); }
           50% { opacity: 1; filter: brightness(2); }
@@ -115,26 +106,29 @@ export default function Home() {
         }
         @keyframes lampOn { from { opacity: 0; } to { opacity: 1; } }
 
-        /* スマホ縦2列のためのスタイル調整（変更なし） */
         @media (max-width: 768px) {
           .mobile-monitor {
-            /* 強制的に幅を縮めて2列入るようにする */
             width: 46% !important; 
             height: auto !important;
-            aspect-ratio: 4/3; /* 比率は維持 */
+            aspect-ratio: 4/3; 
             padding: 8px !important;
           }
-          /* ギャップも少し詰める */
+          
+          /* ★修正2：中のスクリーンも固定pxを解除して比率でリサイズする */
+          .mobile-screen {
+            height: auto !important;
+            aspect-ratio: 16/11 !important; /* 枠内に収まるように調整 */
+            width: 100% !important;
+          }
+
           .monitor-container {
             gap: 10px !important;
           }
         }
       `}</style>
 
-      {/* タイトル */}
       <h1 style={{ textAlign: "center", fontFamily: "monospace", opacity: 0.5, marginBottom: "40px" }}>Filter</h1>
       
-      {/* モニターの壁 */}
       <div 
         className="monitor-container" 
         style={{ display: "flex", flexWrap: "wrap", gap: "20px", justifyContent: "center" }}
@@ -155,7 +149,7 @@ export default function Home() {
   );
 }
 
-// --- 3. スタイル定義（変更なし） ---
+// --- 3. スタイル定義 ---
 const styles = {
   monitorFrame: {
     width: "300px",
@@ -169,7 +163,7 @@ const styles = {
   },
   screen: {
     width: "100%",
-    height: "180px",
+    height: "180px", // ←ここの固定値がモバイルで悪さをしていました
     background: "#000",
     borderRadius: "40% 40% 40% 40% / 10% 10% 10% 10%",
     overflow: "hidden",
