@@ -1,200 +1,111 @@
-// app/page.js
 "use client";
 
-import Link from 'next/link';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
+import { useRouter } from 'next/navigation';
 
-// --- 1. 個別のモニターコンポーネント（変更なし） ---
-const Monitor = ({ videoId, index }) => {
-  const [isClient, setIsClient] = useState(false);
-  const [config, setConfig] = useState({ 
-    startTime: 0, 
-    delay: 0,
-    origin: "" 
-  });
+export default function FakeRestaurant() {
+  const router = useRouter();
+  const [soupState, setSoupState] = useState('none'); // none | full | empty
 
-  useEffect(() => {
-    setIsClient(true);
-    setConfig({
-      startTime: Math.floor(Math.random() * 600),
-      delay: Math.random() * 12,
-      origin: window.location.origin
-    });
-  }, []);
+  // 注文クリック時の処理
+  const order = () => {
+    setSoupState('full');
+  };
 
-  if (!isClient) return <div style={styles.monitorFrame} />;
+  // スープを飲む処理
+  const drinkSoup = () => {
+    setSoupState('empty');
+  };
 
-  return (
-    <div style={styles.monitorFrame} className="mobile-monitor">
-      <div style={styles.screen} className="mobile-screen">
-        {config.origin && (
-          <iframe
-            width="100%"
-            height="100%"
-            src={`https://www.youtube.com/embed/${videoId}?controls=0&modestbranding=1&autoplay=1&mute=1&loop=1&playlist=${videoId}&start=${config.startTime}&origin=${config.origin}&playsinline=1`}
-            title={`Monitor-${index}`}
-            frameBorder="0"
-            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-            style={{ 
-              pointerEvents: "auto",
-              opacity: 0, 
-              animation: `screenOn 0.2s ease-out forwards`, 
-              animationDelay: `${config.delay}s` 
-            }}
-          />
-        )}
-        <div style={styles.scanline}></div>
-      </div>
-      
-      <div className="monitor-label" style={{ marginTop: "5px", display: "flex", justifyContent: "space-between", fontSize: "10px", color: "#444" }}>
-        <span>SONY</span>
-        <span 
-          style={{ 
-            width: "6px", 
-            height: "6px", 
-            background: "#d00", 
-            borderRadius: "50%", 
-            boxShadow: "0 0 6px #f00",
-            opacity: 0,
-            animation: `lampOn 0.1s ease-out forwards`,
-            animationDelay: `${config.delay}s`
-          }}
-        ></span>
-      </div>
-    </div>
-  );
-};
-
-// --- 2. メインページ ---
-export default function Home() {
-  const rawVideoIds = [
-    "L_LUpnjgPso", "L_LUpnjgPso", "L_LUpnjgPso", "L_LUpnjgPso",
-    "q76bMs-NwRk", "q76bMs-NwRk", "q76bMs-NwRk", "q76bMs-NwRk",
-    "jn4lNAfwD0g", "jn4lNAfwD0g", "jn4lNAfwD0g", "jn4lNAfwD0g",
-  ];
-
-  const [shuffledList, setShuffledList] = useState([]);
-
-  useEffect(() => {
-    const list = [...rawVideoIds].sort(() => Math.random() - 0.5);
-    setShuffledList(list);
-  }, []);
+  // 合言葉クリック（裏口へ）
+  const enterBackroom = () => {
+    router.push('/reception');
+  };
 
   return (
-    // ★修正1：背景色を #111 から #000 に変更
-    <main style={{ backgroundColor: "#000", minHeight: "100vh", padding: "20px", color: "#fff" }}>
-      <style jsx global>{`
-        @keyframes screenOn {
-          0% { opacity: 0; filter: brightness(0); }
-          50% { opacity: 1; filter: brightness(2); }
-          100% { opacity: 1; filter: brightness(1); }
-        }
-        @keyframes lampOn { from { opacity: 0; } to { opacity: 1; } }
+    <main style={{ backgroundColor: "#fdfdf5", minHeight: "100vh", fontFamily: "'Times New Roman', serif", color: "#333" }}>
+      {/* --- ヘッダー（機能しない安っぽいリンク） --- */}
+      <header style={{ padding: "20px", borderBottom: "4px double #d00", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+        <div>
+          <h1 style={{ fontSize: "32px", color: "#d00", margin: 0, fontWeight: "bold" }}>海平歇一歇</h1>
+          <p style={{ fontSize: "12px", color: "#888", margin: 0 }}>Hǎipíng Xiē-yī-Xiē Chinese Restaurant</p>
+        </div>
+        <nav style={{ fontSize: "14px", textDecoration: "underline", color: "blue", cursor: "help" }}>
+          <span style={{ margin: "0 10px" }}>Home</span>
+          <span style={{ margin: "0 10px" }}>Menu</span>
+          <span style={{ margin: "0 10px" }}>Location</span>
+        </nav>
+      </header>
 
-        /* ★修正2：モバイルレイアウトの修正を適用 */
-        @media (max-width: 768px) {
-          .monitor-container { 
-            gap: 10px !important; 
-          }
-          .mobile-monitor {
-            /* 48%だと崩れるため46%に変更 */
-            width: 46% !important; 
-            padding: 8px !important; 
-            border-radius: 10px !important; 
-            aspect-ratio: 4/3; /* アスペクト比修正 */
-            height: auto !important;
-          }
-          .mobile-screen { 
-            /* 高さ固定を解除し、比率で制御 */
-            height: auto !important; 
-            aspect-ratio: 16/11 !important;
-            width: 100% !important;
-            border-radius: 4px !important; 
-          }
-          .monitor-label { 
-            margin-top: 4px !important; 
-            font-size: 9px !important; 
-          }
-        }
-      `}</style>
-
-      <h1 style={{ textAlign: "center", fontFamily: "monospace", opacity: 0.5, marginBottom: "40px" }}>Filter</h1>
-      
-      <div className="monitor-container" style={{ display: "flex", flexWrap: "wrap", gap: "20px", justifyContent: "center" }}>
-        {shuffledList.map((id, index) => (
-          <Monitor key={`${id}-${index}`} videoId={id} index={index} />
-        ))}
-      </div>
-
-      {/* 左下のフロアガイド（最新コードのリンク構造を維持） */}
-      <div style={{ position: "fixed", bottom: "20px", left: "20px", zIndex: 100, fontFamily: "monospace", fontSize: "12px", color: "#666", lineHeight: "1.5" }}>
-        <div style={{ marginBottom: "5px", borderBottom: "1px solid #333", paddingBottom: "2px" }}>FLOOR GUIDE</div>
-        <div style={{ color: "#fff" }}>1F : MAIN HALL &lt;</div>
+      {/* --- メインコンテンツ（メニュー表） --- */}
+      <div style={{ maxWidth: "800px", margin: "40px auto", padding: "20px", background: "#fff", boxShadow: "0 0 10px rgba(0,0,0,0.1)", border: "1px solid #ddd" }}>
         
-        <Link href="/aisle/nature">
-          <div style={{ opacity: 0.5, cursor: "pointer", transition: "opacity 0.2s" }} onMouseOver={(e) => e.target.style.opacity = 1} onMouseOut={(e) => e.target.style.opacity = 0.5}>
-            B1 : NATURE
-          </div>
-        </Link>
-        
-        <Link href="/aisle/cyber">
-          <div style={{ opacity: 0.5, cursor: "pointer", transition: "opacity 0.2s" }} onMouseOver={(e) => e.target.style.opacity = 1} onMouseOut={(e) => e.target.style.opacity = 0.5}>
-            B2 : CYBER CITY
-          </div>
-        </Link>
+        {/* お知らせ張り紙風 */}
+        <div style={{ background: "#ffffe0", padding: "10px", border: "1px solid #e0e000", marginBottom: "30px", fontSize: "14px", color: "#550" }}>
+          <strong>Notice:</strong> We are open today. Cash only. No wifi.
+        </div>
 
-        <Link href="/backroom">
-          <div style={{ marginTop: "8px", opacity: 0.3, cursor: "pointer", transition: "opacity 0.2s" }} 
-               onMouseOver={(e) => e.target.style.opacity = 1} 
-               onMouseOut={(e) => e.target.style.opacity = 0.3}>
-            B9 : STAFF ONLY [LOCK]
-          </div>
-        </Link>
-      </div>
+        <h2 style={{ textAlign: "center", borderBottom: "1px solid #ccc", paddingBottom: "10px" }}>今日吃什么? (Today's Menu)</h2>
 
-      {/* 右下の売店（変更なし） */}
-      <Link href="/shop">
-        <div style={{ position: "fixed", bottom: "20px", right: "20px", cursor: "pointer", zIndex: 100 }}>
-          <div style={{ border: "1px solid #555", padding: "10px", background: "#000", fontFamily: "serif", color: "#fff" }}>
-            売店 <br/><span style={{fontSize: "0.8rem"}}>Kiosk -&gt;</span>
+        <div style={{ marginTop: "30px", display: "grid", gridTemplateColumns: "1fr 1fr", gap: "20px" }}>
+          {/* 左側：適当なメニューリスト */}
+          <ul style={{ listStyle: "none", padding: 0 }}>
+            {['海平炒饭 (Fried Rice)', '家常豆腐 (Tofu)', '西红柿炒蛋 (Tomato Egg)', '水饺 (Dumplings)'].map((item, i) => (
+              <li key={i} onClick={order} style={{ padding: "10px", borderBottom: "1px dashed #ccc", cursor: "pointer", display: "flex", justifyContent: "space-between" }}>
+                <span>{item}</span>
+                <span style={{ color: "#d00" }}>$5.00</span>
+              </li>
+            ))}
+          </ul>
+          {/* 右側：画像っぽい枠（読み込めてない風） */}
+          <div style={{ border: "1px solid #ccc", background: "#eee", display: "flex", alignItems: "center", justifyContent: "center", color: "#888", fontSize: "12px", minHeight: "200px" }}>
+            [Image missing]
           </div>
         </div>
-      </Link>
+
+        <div style={{ textAlign: "center", marginTop: "40px" }}>
+          <button onClick={order} style={{ padding: "10px 30px", fontSize: "18px", background: "#d00", color: "#fff", border: "none", cursor: "pointer" }}>
+            今天这样吧 (Order This)
+          </button>
+        </div>
+      </div>
+
+      {/* --- フッター --- */}
+      <footer style={{ textAlign: "center", padding: "20px", fontSize: "12px", color: "#aaa", borderTop: "1px solid #eee", marginTop: "50px" }}>
+        &copy; 1998-2025 海平歇一歇. All rights reserved.
+      </footer>
+
+      {/* --- モーダル（鶏スープ） --- */}
+      {soupState !== 'none' && (
+        <div style={{ position: "fixed", top: 0, left: 0, width: "100%", height: "100%", background: "rgba(0,0,0,0.8)", display: "flex", justifyContent: "center", alignItems: "center", zIndex: 999 }}>
+          
+          <div style={{ background: "#fff", padding: "30px", borderRadius: "10px", textAlign: "center", maxWidth: "90%" }}>
+            {soupState === 'full' ? (
+              // 満杯のスープ
+              <div onClick={drinkSoup} style={{ cursor: "pointer" }}>
+                <h3 style={{ color: "#333" }}>鶏汤 (Chicken Soup)</h3>
+                <p style={{ fontSize: "12px", color: "#666" }}>Service from the owner.</p>
+                {/* スープのイラスト代わりのCSS円 */}
+                <div style={{ width: "200px", height: "200px", background: "radial-gradient(circle at 30% 30%, #ffd700, #daa520)", borderRadius: "50%", margin: "20px auto", border: "5px solid #fff", boxShadow: "0 0 15px rgba(0,0,0,0.2)" }}></div>
+                <p style={{ color: "#d00", fontSize: "14px" }}>Click to drink</p>
+              </div>
+            ) : (
+              // 飲み干したスープ
+              <div>
+                <h3 style={{ color: "#ccc" }}>Empty.</h3>
+                {/* 空の器 */}
+                <div style={{ width: "200px", height: "200px", background: "#fff", borderRadius: "50%", margin: "20px auto", border: "5px solid #ddd", boxShadow: "inset 0 0 20px rgba(0,0,0,0.1)", display: "flex", alignItems: "center", justifyContent: "center" }}>
+                    {/* 合言葉 */}
+                    <span onClick={enterBackroom} style={{ fontSize: "24px", fontWeight: "bold", cursor: "pointer", color: "#333", fontFamily: "monospace" }}>
+                        歇一歇？
+                    </span>
+                </div>
+              </div>
+            )}
+          </div>
+
+        </div>
+      )}
     </main>
   );
 }
-
-// --- 3. スタイル定義（変更なし） ---
-const styles = {
-  monitorFrame: {
-    width: "300px",
-    height: "240px",
-    background: "#222",
-    borderRadius: "20px",
-    padding: "15px",
-    boxShadow: "0 0 20px rgba(0,0,0,0.8), inset 0 0 10px #000",
-    border: "2px solid #333",
-    position: "relative",
-  },
-  screen: {
-    width: "100%",
-    height: "180px",
-    background: "#000",
-    borderRadius: "40% 40% 40% 40% / 10% 10% 10% 10%",
-    overflow: "hidden",
-    position: "relative",
-    boxShadow: "inset 0 0 20px rgba(0,0,0,1)",
-    border: "1px solid #444",
-  },
-  scanline: {
-    position: "absolute",
-    top: 0,
-    left: 0,
-    width: "100%",
-    height: "100%",
-    background: "linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.1) 50%), linear-gradient(90deg, rgba(255, 0, 0, 0.03), rgba(0, 255, 0, 0.01), rgba(0, 0, 255, 0.03))",
-    backgroundSize: "100% 2px, 3px 100%",
-    pointerEvents: "none",
-    zIndex: 10,
-  }
-};

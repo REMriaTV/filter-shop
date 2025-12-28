@@ -1,4 +1,3 @@
-// app/shop/page.js
 import Link from 'next/link';
 
 export default function Shop() {
@@ -6,7 +5,10 @@ export default function Shop() {
     <main style={{ backgroundColor: "#050505", minHeight: "100vh", padding: "40px", color: "#e0e0e0", fontFamily: "serif" }}>
       {/* ナビゲーション */}
       <nav style={{ marginBottom: "60px", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-        <Link href="/" style={{ textDecoration: "none", color: "#555", fontSize: "0.9rem" }}>← Back to Filter</Link>
+        
+        {/* ★修正箇所：戻り先を「/」から「/reception」に変更しました */}
+        <Link href="/reception" style={{ textDecoration: "none", color: "#555", fontSize: "0.9rem" }}>← Back to Filter</Link>
+        
         <div style={{ letterSpacing: "0.2em", fontSize: "0.8rem", color: "#444" }}>KIOSK</div>
       </nav>
 
@@ -18,6 +20,7 @@ export default function Shop() {
           
           {/* 写真エリア */}
           <div style={{ flex: "1 1 350px", display: "flex", justifyContent: "center" }}>
+            {/* ※ publicフォルダに white_001.jpg があることを確認してください */}
             <img 
               src="/white_001.jpg"
               alt="しろいぼう"
@@ -46,7 +49,7 @@ export default function Shop() {
             </div>
 
             <div style={{ marginBottom: "40px" }}>
-              {/* ▼▼▼ ここがメール機能の部分です ▼▼▼ */}
+              {/* メール機能 */}
               <a href="mailto:remuriatv@gmail.com?subject=The Draft 購入希望&body=制作主の気分はいかがですか？在庫があれば譲ってください。">
                 <button style={{ 
                   background: "transparent", 
@@ -62,7 +65,6 @@ export default function Shop() {
                   手に入れる
                 </button>
               </a>
-              {/* ▲▲▲ ここまで ▲▲▲ */}
               
               <p style={{ marginTop: "15px", fontSize: "0.7rem", color: "#444" }}>※在庫状況：制作主の気分別</p>
             </div>
