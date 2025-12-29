@@ -9,8 +9,11 @@ export default function FakeRestaurant() {
   const [showSoup, setShowSoup] = useState(false);
   const [showBill, setShowBill] = useState(false);
   
-  // ★追加：スープを飲み干したかどうかのフラグ
+  // スープを飲み干したかどうかのフラグ
   const [hasDrunkSoup, setHasDrunkSoup] = useState(false);
+  
+  // ★追加：暗転演出用のフラグ
+  const [isTransitioning, setIsTransitioning] = useState(false);
 
   // 注文処理
   const order = (price) => {
@@ -23,7 +26,7 @@ export default function FakeRestaurant() {
     setShowSoup(true);
   };
 
-  // ★追加：スープを「飲み干す」アクション
+  // スープを「飲み干す」アクション
   const drinkSoup = () => {
     setHasDrunkSoup(true); // 飲み干したフラグを立てる
     setShowSoup(false);    // ポップアップを閉じる
@@ -37,8 +40,14 @@ export default function FakeRestaurant() {
     setShowBill(false);
   };
 
+  // ★変更：暗転してから遷移する処理
   const enterBackroom = () => {
-    router.push('/reception');
+    setIsTransitioning(true); // 画面を暗くする
+    
+    // 2秒後にページ遷移（暗転のCSSアニメーションに合わせる）
+    setTimeout(() => {
+      router.push('/reception');
+    }, 2000);
   };
 
   // --- メニューデータ ---
@@ -130,7 +139,7 @@ export default function FakeRestaurant() {
   return (
     <main style={{ backgroundColor: "#fcfcf5", minHeight: "100vh", fontFamily: "'SimSun', 'Songti SC', serif", color: "#b00", cursor: "default" }}>
       
-      {/* --- ヘッダー（提供コードのデザインを維持） --- */}
+      {/* --- ヘッダー --- */}
       <header style={{ 
         padding: "15px", 
         background: "#b00", 
@@ -159,7 +168,7 @@ export default function FakeRestaurant() {
           columnGap: "10px",
           border: "2px solid #b00",
           position: "relative",
-          paddingBottom: "60px" // 下部の余白確保
+          paddingBottom: "60px"
         }}>
           
           {menuCategories.map((cat, i) => (
@@ -203,7 +212,7 @@ export default function FakeRestaurant() {
             <p style={{ margin: 0 }}>现金支付 / 拒绝赊账</p>
           </div>
 
-          {/* ★隠しリンクエリア（新しい3行キャッチコピーに変更）★ */}
+          {/* ★隠しリンクエリア★ */}
            <div style={{ breakInside: "avoid", marginTop: "30px", textAlign: "center", fontSize: "10px", color: "#666", lineHeight: "1.8" }}>
             {/* 1行目 */}
             <p style={{ margin: 0 }}>本店，位于海平线附近</p>
@@ -304,6 +313,20 @@ export default function FakeRestaurant() {
           </div>
         </div>
       )}
+
+      {/* --- ★追加：暗転用オーバーレイ --- */}
+      <div style={{
+        position: "fixed",
+        top: 0,
+        left: 0,
+        width: "100%",
+        height: "100%",
+        backgroundColor: "#000",
+        opacity: isTransitioning ? 1 : 0,
+        pointerEvents: isTransitioning ? "all" : "none",
+        transition: "opacity 2s ease-in-out",
+        zIndex: 9999
+      }} />
 
     </main>
   );
