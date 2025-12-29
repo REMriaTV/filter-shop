@@ -87,20 +87,18 @@ const Monitor = ({ index, floorData }) => {
 // --- 受付メイン ---
 export default function Reception() {
   
-  // ★追加: コンポーネントがマウントされた瞬間に、ブラウザの背景色設定を強制的に上書きする
+  // ページがマウントされた時に確実にbodyにクラスを追加
   useEffect(() => {
-    // html と body の背景色を強制的に黒にする
-    document.documentElement.style.backgroundColor = "#000";
-    document.body.style.backgroundColor = "#000";
+    // bodyにクラスを追加
+    document.body.classList.add('reception-page');
     
-    // バウンススクロールなどの余計な挙動を一時的に停止
-    document.body.style.overscrollBehavior = "none";
-    document.documentElement.style.overscrollBehavior = "none";
-
-    // クリーンアップ（ページを離れる時に戻すかどうかはお好みですが、今回は黒のままでOK）
+    // 念のためスタイルも設定
+    document.body.style.backgroundColor = "#000";
+    document.body.style.color = "#fff";
+    
+    // ページを離れるときにクラスを削除
     return () => {
-      document.body.style.overscrollBehavior = "auto";
-      document.documentElement.style.overscrollBehavior = "auto";
+      document.body.classList.remove('reception-page');
     };
   }, []);
 
@@ -116,7 +114,6 @@ export default function Reception() {
   };
 
   return (
-    // ★変更: minHeight: 100dvh に加え、overscroll-behavior: none をCSSでも指定
     <main 
       style={{ 
         backgroundColor: "#000", 
@@ -125,20 +122,11 @@ export default function Reception() {
         padding: "20px", 
         color: "#fff", 
         position: "relative",
-        overflowX: "hidden" 
+        overflowX: "hidden"
       }} 
       className="reception-page"
     >
       <style jsx global>{`
-        /* ★重要: html, body レベルで背景を黒にし、バウンス（引っ張り）を無効化 */
-        html, body {
-          background-color: #000 !important;
-          margin: 0;
-          padding: 0;
-          overscroll-behavior: none !important; /* スマホで引っ張った時の余白を無効化 */
-          -webkit-overflow-scrolling: touch;
-        }
-
         @keyframes screenOn { 0% { opacity: 0; filter: brightness(0); } 50% { opacity: 1; filter: brightness(2); } 100% { opacity: 1; filter: brightness(1); } }
         
         @keyframes curtainFadeOut { 
@@ -155,10 +143,9 @@ export default function Reception() {
       `}</style>
 
       {/* 画面遷移時のフラッシュ防止用「黒い幕」 */}
-      {/* 画面全体を覆うため height: 120vh にして余裕を持たせる */}
       <div style={{
         position: "fixed",
-        top: -100, left: 0, width: "100%", height: "200vh", // バウンスしても黒が見えるように大きく
+        top: -100, left: 0, width: "100%", height: "200vh",
         backgroundColor: "#000",
         zIndex: 9999, 
         animation: "curtainFadeOut 3s ease-out forwards"
