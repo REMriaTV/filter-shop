@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 
-// --- 1. Monitor コンポーネント（復活） ---
+// --- モニターコンポーネント ---
 const Monitor = ({ index, floorData }) => {
   const router = useRouter();
   const [config, setConfig] = useState({ startTime: 0, delay: 0, origin: "" });
@@ -84,28 +84,9 @@ const Monitor = ({ index, floorData }) => {
   );
 };
 
-// --- 2. 受付メイン（安全対策済み） ---
+// --- 受付メイン ---
 export default function Reception() {
   
-  // ★安全策：ページ表示時にメタタグだけ黒にする（DOM破壊はしない）
-  useEffect(() => {
-    let metaThemeColor = document.querySelector("meta[name=theme-color]");
-    if (!metaThemeColor) {
-      metaThemeColor = document.createElement("meta");
-      metaThemeColor.setAttribute("name", "theme-color");
-      document.head.appendChild(metaThemeColor);
-    }
-    // ここで黒を指定
-    metaThemeColor.setAttribute("content", "#000000");
-    
-    // 念のためbody背景色も
-    document.body.style.backgroundColor = "#000";
-
-    return () => {
-      document.body.style.backgroundColor = "";
-    };
-  }, []);
-
   const getMonitorData = (i) => {
     const index = i + 1;
     if (index === 1) return { type: 'link', path: '/floor/ocean', videoId: 'jn4lNAfwD0g' };
@@ -118,41 +99,17 @@ export default function Reception() {
   };
 
   return (
-    // ★レイアウト崩れを防ぐため fixed で画面全体を覆う
-    <div style={{
-      position: 'fixed',
-      top: 0,
-      left: 0,
-      width: '100vw',
-      height: '100dvh', // モバイル用にdvhを使用
-      backgroundColor: '#000',
-      color: '#fff',
-      overflowY: 'auto', // スクロール可能に
-      overflowX: 'hidden',
-      zIndex: 100000
-    }}>
+    // ★変更: main自体は最初から不透明(opacity:1)で、背景は黒。これで白飛びを防ぐ。
+    <main style={{ backgroundColor: "#000", minHeight: "100vh", padding: "20px", color: "#fff", position: "relative" }}>
       <style jsx global>{`
-        /* ★最重要: 亡霊のような赤いヘッダーをCSSで強制的に消す（安全確実） */
-        header {
-          display: none !important;
-        }
-
-        /* ページ全体のリセット */
-        html, body {
-          background-color: #000 !important;
-          margin: 0 !important;
-          padding: 0 !important;
-          overflow: hidden !important; /* ベースはスクロールさせない */
-        }
-
         @keyframes screenOn { 0% { opacity: 0; filter: brightness(0); } 50% { opacity: 1; filter: brightness(2); } 100% { opacity: 1; filter: brightness(1); } }
         
+        /* ★追加: 黒い幕が徐々に消えるアニメーション */
         @keyframes curtainFadeOut { 
           from { opacity: 1; pointer-events: all; } 
           to { opacity: 0; pointer-events: none; } 
         }
 
-        /* モバイルレイアウト設定 */
         @media (max-width: 768px) {
           .monitor-container { gap: 8px !important; }
           .mobile-monitor { width: 48% !important; padding: 8px !important; border-radius: 10px !important; aspect-ratio: 5/4 !important; height: auto !important; }
@@ -161,46 +118,37 @@ export default function Reception() {
         }
       `}</style>
 
-      {/* 黒い幕 */}
+      {/* ★追加: 画面遷移時のフラッシュ防止用「黒い幕」 */}
       <div style={{
         position: "fixed",
-        top: -100, left: 0, width: "100%", height: "200vh",
+        top: 0, left: 0, width: "100%", height: "100%",
         backgroundColor: "#000",
-        zIndex: 99999,
-        animation: "curtainFadeOut 3s ease-out forwards"
+        zIndex: 9999, // 最前面
+        animation: "curtainFadeOut 3s ease-out forwards" // 3秒かけて黒が消えていく
       }}></div>
 
-      <main style={{ 
-        backgroundColor: "#000", 
-        minHeight: "100vh", 
-        padding: "20px", 
-        color: "#fff", 
-        position: "relative",
-        zIndex: 1
-      }}>
-        <h1 style={{ textAlign: "center", fontFamily: "monospace", opacity: 0.3, marginBottom: "40px", letterSpacing: "5px" }}>
-          FILTER SHOP B.P.O
-        </h1>
-        
-        <div className="monitor-container" style={{ display: "flex", flexWrap: "wrap", gap: "20px", justifyContent: "center" }}>
-          {Array.from({ length: 12 }).map((_, i) => (
-            <Monitor key={i} index={i + 1} floorData={getMonitorData(i)} />
-          ))}
-        </div>
+      <h1 style={{ textAlign: "center", fontFamily: "monospace", opacity: 0.3, marginBottom: "40px", letterSpacing: "5px" }}>
+        FILTER SHOP B.P.O
+      </h1>
+      
+      <div className="monitor-container" style={{ display: "flex", flexWrap: "wrap", gap: "20px", justifyContent: "center" }}>
+        {Array.from({ length: 12 }).map((_, i) => (
+          <Monitor key={i} index={i + 1} floorData={getMonitorData(i)} />
+        ))}
+      </div>
 
-        <Link href="/shop">
-          <div style={{ position: "fixed", bottom: "20px", right: "20px", cursor: "pointer", zIndex: 100 }}>
-            <div style={{ border: "1px solid #555", padding: "10px", background: "#000", fontFamily: "serif", color: "#fff" }}>
-              売店 <br/><span style={{fontSize: "0.8rem"}}>Kiosk -&gt;</span>
-            </div>
+      <Link href="/shop">
+        <div style={{ position: "fixed", bottom: "20px", right: "20px", cursor: "pointer", zIndex: 100 }}>
+          <div style={{ border: "1px solid #555", padding: "10px", background: "#000", fontFamily: "serif", color: "#fff" }}>
+            売店 <br/><span style={{fontSize: "0.8rem"}}>Kiosk -&gt;</span>
           </div>
-        </Link>
-      </main>
-    </div>
+        </div>
+      </Link>
+
+    </main>
   );
 }
 
-// --- 3. Styles (復活) ---
 const styles = {
   monitorFrame: { width: "300px", height: "240px", background: "#222", borderRadius: "20px", padding: "15px", boxShadow: "0 0 20px rgba(0,0,0,0.8), inset 0 0 10px #000", border: "2px solid #333", position: "relative" },
   screen: { width: "100%", height: "180px", background: "#000", borderRadius: "40% 40% 40% 40% / 10% 10% 10% 10%", overflow: "hidden", position: "relative", boxShadow: "inset 0 0 20px rgba(0,0,0,1)", border: "1px solid #444" },
