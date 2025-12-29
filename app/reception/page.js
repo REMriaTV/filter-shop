@@ -12,7 +12,7 @@ const Monitor = ({ index, floorData }) => {
   useEffect(() => {
     setConfig({
       startTime: Math.floor(Math.random() * 600),
-      delay: Math.random() * 12,
+      delay: Math.random() * 12, 
       origin: window.location.origin
     });
   }, []);
@@ -31,7 +31,7 @@ const Monitor = ({ index, floorData }) => {
       style={{
         ...styles.monitorFrame,
         cursor: floorData.type === 'link' ? 'pointer' : 'default',
-        borderColor: isGlitch ? "#444" : "#333" 
+        borderColor: isGlitch ? "#444" : "#333",
       }}
       className="mobile-monitor"
     >
@@ -70,11 +70,14 @@ const Monitor = ({ index, floorData }) => {
           background: floorData.type === 'link' ? (isGlitch ? "#fff" : "#d00") : "#333",
           borderRadius: "50%", 
           boxShadow: floorData.type === 'link' ? (isGlitch ? "0 0 6px #fff" : "0 0 6px #f00") : "none",
-          transition: "background 0.3s"
+          transition: "background 0.3s",
+          opacity: 0,
+          animation: `screenOn 0.2s ease-out forwards`,
+          animationDelay: `${config.delay}s`
         }}></span>
       </div>
 
-      {/* ★追加修正: これが一番手前に来る「透明なクリック判定レイヤー」です。映像やノイズの上からクリックを受け止めます */}
+      {/* 透明なクリック判定レイヤー */}
       <div style={{ position: "absolute", top: 0, left: 0, width: "100%", height: "100%", zIndex: 50 }}></div>
 
     </div>
@@ -86,15 +89,9 @@ export default function Reception() {
   
   const getMonitorData = (i) => {
     const index = i + 1;
-    // B1: Ocean
     if (index === 1) return { type: 'link', path: '/floor/ocean', videoId: 'jn4lNAfwD0g' };
-    // B3: Cyber
     if (index === 3) return { type: 'link', path: '/floor/cyber', videoId: '5wRM7c9uJ2Q' };
-    
-    // ★隠し部屋（管理人室）
     if (index === 4) return { type: 'link', path: '/floor/admin', videoId: '09R8_2nJtjg' }; 
-
-    // B9: Nature
     if (index === 9) return { type: 'link', path: '/floor/nature', videoId: 'L_LUpnjgPso' };
 
     const excuses = ["今天没货 (No Stock)", "去找新鲜的了 (Gone Fishing)", "休一天 (Closed)", "Wait...", "Empty", "System Check", "404 Not Found"];
@@ -102,9 +99,17 @@ export default function Reception() {
   };
 
   return (
-    <main style={{ backgroundColor: "#111", minHeight: "100vh", padding: "20px", color: "#fff" }}>
+    // ★変更: main自体は最初から不透明(opacity:1)で、背景は黒。これで白飛びを防ぐ。
+    <main style={{ backgroundColor: "#000", minHeight: "100vh", padding: "20px", color: "#fff", position: "relative" }}>
       <style jsx global>{`
         @keyframes screenOn { 0% { opacity: 0; filter: brightness(0); } 50% { opacity: 1; filter: brightness(2); } 100% { opacity: 1; filter: brightness(1); } }
+        
+        /* ★追加: 黒い幕が徐々に消えるアニメーション */
+        @keyframes curtainFadeOut { 
+          from { opacity: 1; pointer-events: all; } 
+          to { opacity: 0; pointer-events: none; } 
+        }
+
         @media (max-width: 768px) {
           .monitor-container { gap: 8px !important; }
           .mobile-monitor { width: 48% !important; padding: 8px !important; border-radius: 10px !important; aspect-ratio: 5/4 !important; height: auto !important; }
@@ -112,6 +117,15 @@ export default function Reception() {
           .monitor-label { margin-top: 4px !important; font-size: 9px !important; }
         }
       `}</style>
+
+      {/* ★追加: 画面遷移時のフラッシュ防止用「黒い幕」 */}
+      <div style={{
+        position: "fixed",
+        top: 0, left: 0, width: "100%", height: "100%",
+        backgroundColor: "#000",
+        zIndex: 9999, // 最前面
+        animation: "curtainFadeOut 3s ease-out forwards" // 3秒かけて黒が消えていく
+      }}></div>
 
       <h1 style={{ textAlign: "center", fontFamily: "monospace", opacity: 0.3, marginBottom: "40px", letterSpacing: "5px" }}>
         FILTER SHOP B.P.O

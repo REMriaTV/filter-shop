@@ -1,7 +1,8 @@
 "use client";
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
+import Image from 'next/image';
 
 export default function FakeRestaurant() {
   const router = useRouter();
@@ -12,24 +13,23 @@ export default function FakeRestaurant() {
   // スープを飲み干したかどうかのフラグ
   const [hasDrunkSoup, setHasDrunkSoup] = useState(false);
   
-  // ★追加：暗転演出用のフラグ
-  const [isTransitioning, setIsTransitioning] = useState(false);
+  // 遷移の進行状況を管理するステート
+  // 0: 通常, 1: 最初の暗転, 2: GIF再生, 3: 強制切断(暗転), 4: 遷移
+  const [transitionStage, setTransitionStage] = useState(0);
 
   // 注文処理
   const order = (price) => {
-    // "时价"や"售罄"などの文字を除外して計算
     const numPrice = parseFloat(price);
     if (!isNaN(numPrice)) {
       setTotal(prev => prev + numPrice);
     }
-    // 注文するとスープが出る（おまけ）
     setShowSoup(true);
   };
 
   // スープを「飲み干す」アクション
   const drinkSoup = () => {
-    setHasDrunkSoup(true); // 飲み干したフラグを立てる
-    setShowSoup(false);    // ポップアップを閉じる
+    setHasDrunkSoup(true); 
+    setShowSoup(false);    
   };
 
   const closeSoup = () => {
@@ -40,15 +40,30 @@ export default function FakeRestaurant() {
     setShowBill(false);
   };
 
-  // ★変更：暗転してから遷移する処理
+  // 遷移処理を開始する関数
   const enterBackroom = () => {
-    setIsTransitioning(true); // 画面を暗くする
-    
-    // 2秒後にページ遷移（暗転のCSSアニメーションに合わせる）
-    setTimeout(() => {
-      router.push('/reception');
-    }, 2000);
+    // Stage 1: 最初の暗転を開始
+    setTransitionStage(1);
   };
+
+  // タイムラインの調整
+  useEffect(() => {
+    if (transitionStage === 1) {
+      // Stage 1 -> 2: 2秒で暗転完了後、黒幕を上げてGIF表示フェーズへ
+      setTimeout(() => setTransitionStage(2), 2000);
+    } else if (transitionStage === 2) {
+      // Stage 2 -> 3: GIF再生開始。
+      // ★変更：4.0秒で強制切断（文字が出るかなり前）
+      setTimeout(() => setTransitionStage(3), 4000); 
+    } else if (transitionStage === 3) {
+      // Stage 3 -> 4: 真っ黒のまま2秒間余韻を残す
+      setTimeout(() => setTransitionStage(4), 2000);
+    } else if (transitionStage === 4) {
+      // Stage 4: ページ遷移実行
+      router.push('/reception');
+    }
+  }, [transitionStage, router]);
+
 
   // --- メニューデータ ---
   const menuCategories = [
@@ -212,23 +227,17 @@ export default function FakeRestaurant() {
             <p style={{ margin: 0 }}>现金支付 / 拒绝赊账</p>
           </div>
 
-          {/* ★隠しリンクエリア★ */}
+          {/* 隠しリンクエリア */}
            <div style={{ breakInside: "avoid", marginTop: "30px", textAlign: "center", fontSize: "10px", color: "#666", lineHeight: "1.8" }}>
-            {/* 1行目 */}
             <p style={{ margin: 0 }}>本店，位于海平线附近</p>
-            
-            {/* 2行目 */}
             <p style={{ margin: 0 }}>新鲜，从海拔0米开始</p>
-            
-            {/* ★3行目：上と同じデザインにしてカモフラージュ（飲み干すと出現）★ */}
             <p 
               style={{ 
                 margin: 0, 
-                color: "#666", // 上の行と同じ色
-                cursor: hasDrunkSoup ? "pointer" : "default", // 飲み干したらポインターに
+                color: "#666",
+                cursor: hasDrunkSoup ? "pointer" : "default",
                 opacity: hasDrunkSoup ? 1 : 0, 
                 pointerEvents: hasDrunkSoup ? "auto" : "none",
-                // transitionなしでしれっと表示される
               }}
               onClick={enterBackroom}
             >
@@ -239,73 +248,33 @@ export default function FakeRestaurant() {
         </div>
       </div>
 
-      {/* --- ポップアップ 1: スープ (画像 + 飲み干す機能) --- */}
+      {/* --- ポップアップ 1: スープ --- */}
       {showSoup && (
         <div onClick={closeSoup} style={{ 
           position: "fixed", top: 0, left: 0, width: "100%", height: "100%", 
           background: "rgba(0,0,0,0.6)", zIndex: 100, display: "flex", justifyContent: "center", alignItems: "center"
         }}>
-          <div 
-             onClick={(e) => e.stopPropagation()} 
-             style={{ 
-                 background: "#fff", 
-                 padding: "30px", 
-                 border: "4px double #b00", 
-                 textAlign: "center", 
-                 maxWidth: "300px",
-                 boxShadow: "0 0 20px rgba(0,0,0,0.5)"
-             }}
-          >
+          <div onClick={(e) => e.stopPropagation()} style={{ background: "#fff", padding: "30px", border: "4px double #b00", textAlign: "center", maxWidth: "300px", boxShadow: "0 0 20px rgba(0,0,0,0.5)" }}>
             <h3 style={{ color: "#b00", margin: "0 0 15px", fontFamily: "'SimSun', serif", fontSize: "20px", borderBottom: "1px solid #ddd", paddingBottom: "10px" }}>
                 鶏汤已经准备好了。
             </h3>
-            
-            {/* 画像表示 */}
             <div style={{ margin: "0 auto 15px" }}>
-                <img 
-                  src="/torisoba_1.png" 
-                  alt="Chicken Soup"
-                  style={{
-                    width: "100%",
-                    maxWidth: "200px",
-                    height: "auto",
-                    display: "block",
-                    margin: "0 auto",
-                    border: "1px solid #ccc",
-                    boxShadow: "2px 2px 5px rgba(0,0,0,0.2)"
-                  }}
-                />
+                <img src="/torisoba_1.png" alt="Chicken Soup" style={{ width: "100%", maxWidth: "200px", height: "auto", display: "block", margin: "0 auto", border: "1px solid #ccc", boxShadow: "2px 2px 5px rgba(0,0,0,0.2)" }} />
             </div>
-            
-            {/* 飲み干すボタン */}
-            <div 
-                onClick={drinkSoup}
-                style={{ 
-                    marginTop: "10px", 
-                    cursor: "pointer", 
-                    fontSize: "14px", 
-                    color: "#b00", 
-                    textDecoration: "underline",
-                    fontWeight: "bold"
-                }}
-            >
+            <div onClick={drinkSoup} style={{ marginTop: "10px", cursor: "pointer", fontSize: "14px", color: "#b00", textDecoration: "underline", fontWeight: "bold" }}>
                 喝完
             </div>
           </div>
         </div>
       )}
 
-      {/* --- ポップアップ 2: お会計 (通貨を¥に変更) --- */}
+      {/* --- ポップアップ 2: お会計 --- */}
       {showBill && (
-        <div onClick={closeBill} style={{ 
-          position: "fixed", top: 0, left: 0, width: "100%", height: "100%", 
-          background: "rgba(0,0,0,0.8)", zIndex: 101, display: "flex", justifyContent: "center", alignItems: "center"
-        }}>
+        <div onClick={closeBill} style={{ position: "fixed", top: 0, left: 0, width: "100%", height: "100%", background: "rgba(0,0,0,0.8)", zIndex: 101, display: "flex", justifyContent: "center", alignItems: "center" }}>
           <div style={{ background: "#fff", width: "250px", padding: "20px", fontFamily: "monospace", boxShadow: "0 0 20px #000" }}>
              <h3 style={{ textAlign: "center", borderBottom: "1px dashed #000", paddingBottom: "10px", margin: 0 }}>收款单</h3>
              <div style={{ display: "flex", justifyContent: "space-between", margin: "20px 0" }}>
                <span>总计</span>
-               {/* 通貨を ¥ に変更 */}
                <span style={{ fontSize: "20px", fontWeight: "bold", color: "#d00" }}>¥{total.toFixed(2)}</span>
              </div>
              <p style={{ textAlign: "center", fontSize: "12px", color: "#b00" }}>仅收现金 / 概不赊账</p>
@@ -314,18 +283,37 @@ export default function FakeRestaurant() {
         </div>
       )}
 
-      {/* --- ★追加：暗転用オーバーレイ --- */}
+      {/* --- 遷移アニメーション用要素 --- */}
+
+      {/* 2. GIFアニメーション (Stage 2と3の時のみ表示) */}
+      {(transitionStage === 2 || transitionStage === 3) && (
+        <div style={{
+          position: "fixed", top: 0, left: 0, width: "100%", height: "100%",
+          backgroundColor: "#000", 
+          display: "flex", justifyContent: "center", alignItems: "center",
+          zIndex: 9998 
+        }}>
+          <Image 
+            src="/kaihei-open.gif"
+            alt="Transition Animation"
+            width={800} 
+            height={600}
+            style={{ maxWidth: "100%", height: "auto" }}
+            unoptimized 
+          />
+        </div>
+      )}
+
+      {/* 1 & 3. 暗転用黒背景 (最前面) */}
       <div style={{
-        position: "fixed",
-        top: 0,
-        left: 0,
-        width: "100%",
-        height: "100%",
+        position: "fixed", top: 0, left: 0, width: "100%", height: "100%",
         backgroundColor: "#000",
-        opacity: isTransitioning ? 1 : 0,
-        pointerEvents: isTransitioning ? "all" : "none",
-        transition: "opacity 2s ease-in-out",
-        zIndex: 9999
+        // Stage 1(最初) または Stage 3(最後) 以降は真っ黒
+        opacity: (transitionStage === 1 || transitionStage >= 3) ? 1 : 0,
+        pointerEvents: transitionStage !== 0 ? "all" : "none",
+        // Stage 3だけアニメーションなし（0秒）でバサッと切る
+        transition: (transitionStage === 3) ? "none" : "opacity 2s ease-in-out", 
+        zIndex: 9999 
       }} />
 
     </main>
