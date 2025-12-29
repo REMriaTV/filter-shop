@@ -9,11 +9,14 @@ export default function FakeRestaurant() {
   const [showSoup, setShowSoup] = useState(false);
   const [showBill, setShowBill] = useState(false);
 
+  // 注文処理
   const order = (price) => {
+    // "时价"や"售罄"などの文字を除外して計算
     const numPrice = parseFloat(price);
     if (!isNaN(numPrice)) {
       setTotal(prev => prev + numPrice);
     }
+    // 注文するとスープが出る（おまけ）
     setShowSoup(true);
   };
 
@@ -29,229 +32,224 @@ export default function FakeRestaurant() {
     router.push('/reception');
   };
 
+  // --- メニューデータ（価格の英語も排除） ---
   const menuCategories = [
     {
-      title: ":: Cold Dishes / 凉菜 ::",
+      title: "【凉菜・前菜】",
       items: [
-        { name: "皮蛋豆腐 (Preserved Egg)", price: "5.0" },
-        { name: "凉拌海带丝 (Seaweed)", price: "4.5" },
-        { name: "蒜泥白肉 (Pork w/ Garlic)", price: "12.0" },
-        { name: "凉拌焦虑 (Cold Anxiety)", price: "0.0" },
-        { name: "拍黄瓜 (Cucumber)", price: "4.0" },
-        { name: "口水鸡 (Spicy Chicken)", price: "15.0" },
-        { name: "夫妻肺片 (Beef Tripe)", price: "18.0" },
-        { name: "盐水沉默 (Salty Silence)", price: "Market Price" },
+        { name: "皮蛋豆腐", price: "5.0" },
+        { name: "凉拌海带丝", price: "4.5" },
+        { name: "蒜泥白肉", price: "12.0" },
+        { name: "凉拌焦虑", price: "0.0" },
+        { name: "拍黄瓜", price: "4.0" },
+        { name: "口水鸡", price: "15.0" },
+        { name: "夫妻肺片", price: "18.0" },
+        { name: "盐水沉默", price: "时价" },
+        { name: "五香牛肉", price: "22.0" },
+        { name: "红油耳丝", price: "10.0" },
+        { name: "老醋花生", price: "6.0" },
+        { name: "麻酱油麦菜", price: "8.0" },
+        { name: "昨夜的剩菜", price: "2.0" },
+        { name: "香菜拌牛肉", price: "24.0" },
       ]
     },
     {
-      title: ":: Hot Dishes / 热菜 ::",
+      title: "【热菜・肉类】",
       items: [
-        { name: "宫保鸡丁 (Kung Pao Chicken)", price: "18.0" },
-        { name: "鱼香肉丝 (Pork strip)", price: "16.0" },
-        { name: "回锅肉 (Double Cooked Pork)", price: "20.0" },
-        { name: "水煮牛肉 (Boiled Beef)", price: "28.0" },
-        { name: "爆炒拖延症 (Fried Delay)", price: "11.5" },
-        { name: "糖醋里脊 (Sweet Sour Pork)", price: "18.0" },
-        { name: "红烧肉 (Braised Pork)", price: "26.0" },
-        { name: "具体的绝望 (Specific Despair)", price: "5.0" },
-        { name: "红烧那个下午 (That Afternoon)", price: "99.0" },
+        { name: "宫保鸡丁", price: "18.0" },
+        { name: "鱼香肉丝", price: "16.0" },
+        { name: "回锅肉", price: "20.0" },
+        { name: "水煮牛肉", price: "28.0" },
+        { name: "爆炒拖延症", price: "11.5" },
+        { name: "糖醋里脊", price: "18.0" },
+        { name: "红烧肉", price: "26.0" },
+        { name: "具体的绝望", price: "5.0" },
+        { name: "辣子鸡丁", price: "22.0" },
+        { name: "孜然羊肉", price: "32.0" },
+        { name: "京酱肉丝", price: "18.0" },
+        { name: "红烧那个下午", price: "99.0" },
+        { name: "木须肉", price: "15.0" },
+        { name: "葱爆羊肉", price: "30.0" },
       ]
     },
     {
-      title: ":: Soup & Rice / 主食 ::",
+      title: "【热菜・素菜】",
       items: [
-        { name: "西红柿蛋汤 (Tomato Soup)", price: "5.0" },
-        { name: "酸辣汤 (Hot Sour Soup)", price: "6.0" },
-        { name: "混沌汤 (Chaos Soup)", price: "6.5" },
-        { name: "米饭 (Rice)", price: "1.0" },
-        { name: "扬州炒饭 (Fried Rice)", price: "15.0" },
-        { name: "什么都没有 (Nothing)", price: "100.0" },
+        { name: "麻婆豆腐", price: "8.0" },
+        { name: "地三鲜", price: "12.0" },
+        { name: "清炒时蔬", price: "10.0" },
+        { name: "无法挽回的时间", price: "售罄" }, // Sold Out -> 售罄
+        { name: "番茄炒蛋", price: "10.0" },
+        { name: "干煸四季豆", price: "14.0" },
+        { name: "酸辣土豆丝", price: "8.0" },
+        { name: "家常豆腐", price: "12.0" },
+        { name: "油炸且过", price: "3.5" },
+        { name: "虎皮青椒", price: "9.0" },
+        { name: "红烧茄子", price: "11.0" },
+      ]
+    },
+    {
+      title: "【汤・主食】",
+      items: [
+        { name: "西红柿蛋汤", price: "5.0" },
+        { name: "酸辣汤", price: "6.0" },
+        { name: "紫菜蛋花汤", price: "4.0" },
+        { name: "混沌汤", price: "6.5" },
+        { name: "米饭", price: "1.0" },
+        { name: "扬州炒饭", price: "15.0" },
+        { name: "水饺(猪肉白菜)", price: "12.0" },
+        { name: "什么都没有", price: "100.0" },
+        { name: "炸酱面", price: "14.0" },
+        { name: "担担面", price: "8.0" },
+        { name: "馒头", price: "1.0" },
+      ]
+    },
+    {
+      title: "【酒水・饮料】",
+      items: [
+        { name: "青岛啤酒", price: "6.0" },
+        { name: "二锅头", price: "15.0" },
+        { name: "王老吉", price: "4.0" },
+        { name: "酸梅汤", price: "5.0" },
+        { name: "忘情水", price: "50.0" },
+        { name: "冰红茶", price: "3.0" },
+        { name: "椰树牌椰汁", price: "5.0" },
       ]
     }
   ];
 
   return (
-    // 背景：黄色いテクスチャ風、または単色クリーム色 #FFFFCC
-    <main style={{ backgroundColor: "#FFFFCC", minHeight: "100vh", fontFamily: "'Times New Roman', serif", color: "#8B0000" }}>
+    <main style={{ backgroundColor: "#fcfcf5", minHeight: "100vh", fontFamily: "'SimSun', 'Songti SC', serif", color: "#b00", cursor: "default" }}>
       
-      {/* センター寄せのコンテナ */}
-      <div style={{ width: "800px", margin: "0 auto", backgroundColor: "#FFFFFF", border: "1px solid #000000", paddingBottom: "50px" }}>
+      {/* --- ヘッダー（完全中国語化） --- */}
+      <header style={{ 
+        padding: "15px", 
+        background: "#b00", 
+        color: "#ff0", 
+        textAlign: "center", 
+        borderBottom: "5px double #ff0", 
+        position: "sticky", 
+        top: 0, 
+        zIndex: 10,
+        boxShadow: "0 2px 5px rgba(0,0,0,0.2)"
+      }}>
+        {/* 店名変更：大福海平歇一歇 */}
+        <h1 style={{ fontSize: "24px", margin: 0, fontWeight: "900", fontFamily: "'SimHei', sans-serif", lineHeight: "1" }}>
+          大福海平歇一歇
+        </h1>
+        <div style={{ fontSize: "10px", letterSpacing: "1px", marginTop: "4px" }}>中华老字号 / 地道家常菜</div>
+      </header>
+
+      {/* --- メインコンテンツ --- */}
+      <div style={{ maxWidth: "800px", margin: "0 auto", padding: "10px" }}>
         
-        {/* ヘッダー：原色赤の背景に黄色文字 */}
-        <header style={{ backgroundColor: "#FF0000", padding: "20px", textAlign: "center", borderBottom: "5px solid #FFD700" }}>
-          <h1 style={{ color: "#FFFF00", margin: 0, fontSize: "40px", fontFamily: "'SimHei', sans-serif", textShadow: "2px 2px #000" }}>
-            海平歇一歇
-          </h1>
-          <div style={{ color: "#FFFFFF", fontWeight: "bold", fontSize: "14px", marginTop: "5px" }}>
-            HAIPING CHINESE RESTAURANT HOMEPAGE
-          </div>
-        </header>
-
-        {/* ナビゲーションバー */}
-        <div style={{ textAlign: "center", padding: "5px", borderBottom: "1px solid #ccc", backgroundColor: "#eeeeee", fontSize: "12px" }}>
-          <span style={{ color: "#0000EE", textDecoration: "underline", cursor: "pointer" }}>Top</span> | 
-          <span style={{ color: "#0000EE", textDecoration: "underline", cursor: "pointer" }}>Menu</span> | 
-          <span style={{ color: "#0000EE", textDecoration: "underline", cursor: "pointer" }}>Location</span> | 
-          <span style={{ color: "#0000EE", textDecoration: "underline", cursor: "pointer" }}>Mail</span>
-        </div>
-
-        {/* コンテンツエリア */}
-        <div style={{ padding: "20px" }}>
+        <div style={{ 
+          background: "#fff",
+          padding: "15px",
+          boxShadow: "0 0 10px rgba(0,0,0,0.2)",
+          columnCount: 3, 
+          columnGap: "10px",
+          border: "2px solid #b00",
+          position: "relative",
+          paddingBottom: "60px" // 下部の余白確保
+        }}>
           
-          <div style={{ textAlign: "center", marginBottom: "30px" }}>
-            <p style={{ color: "#FF0000", fontWeight: "bold" }}>
-              *** WELCOME TO OUR HOMEPAGE ***
-            </p>
-            <p style={{ fontSize: "12px" }}>
-              Traditional Taste / Cash Only / No Service Charge
-            </p>
-            <hr style={{ width: "80%", color: "red" }} />
-          </div>
-
-          {/* メニュー表：HTMLテーブル */}
-          <table width="90%" align="center" border="0" cellPadding="5">
-            {menuCategories.map((cat, i) => (
-              <tbody key={i}>
-                <tr>
-                  <td colSpan="2" style={{ backgroundColor: "#FFCC00", color: "#8B0000", fontWeight: "bold", textAlign: "center" }}>
-                    {cat.title}
-                  </td>
-                </tr>
+          {menuCategories.map((cat, i) => (
+            <div key={i} style={{ breakInside: "avoid", marginBottom: "15px" }}>
+              <h3 style={{ fontSize: "16px", fontWeight: "900", borderBottom: "2px solid #b00", marginBottom: "5px", paddingTop: "5px", lineHeight: "1.2" }}>
+                {cat.title}
+              </h3>
+              <ul style={{ listStyle: "none", padding: 0, margin: 0 }}>
                 {cat.items.map((item, j) => (
-                  <tr key={j}>
-                    <td style={{ borderBottom: "1px dotted #ccc" }}>
-                      <span 
-                        onClick={() => order(item.price)}
-                        style={{ color: "#0000EE", textDecoration: "underline", cursor: "pointer", fontSize: "14px" }}
-                      >
-                        {item.name}
-                      </span>
-                    </td>
-                    <td align="right" style={{ borderBottom: "1px dotted #ccc", color: "#FF0000", fontWeight: "bold" }}>
-                      ${item.price}
-                    </td>
-                  </tr>
+                  <li key={j} onClick={() => order(item.price)} style={{ 
+                    display: "flex", justifyContent: "space-between", alignItems: "bottom",
+                    borderBottom: "1px dotted #eeb", fontSize: "13px", lineHeight: "1.3", padding: "1px 0",
+                    cursor: "pointer", color: "#000"
+                  }}>
+                    <span style={{ fontFamily: "'SimSun', serif", fontWeight: "600" }}>{item.name}</span>
+                    <span style={{ color: "#b00", fontWeight: "bold", fontSize: "12px" }}>{item.price}</span>
+                  </li>
                 ))}
-                <tr><td colSpan="2" height="10"></td></tr>
-              </tbody>
-            ))}
-          </table>
-          
-          <br/><br/>
-
-          {/* 会計リンク：画像をリンクボタンにしたようなデザイン */}
-          <div style={{ textAlign: "center", border: "2px dashed #FF0000", padding: "10px", margin: "20px auto", width: "60%" }}>
-            <p style={{ margin: "0 0 5px 0", fontSize: "12px", color: "red" }}>Ready to Pay?</p>
-            <button 
-              onClick={() => setShowBill(true)}
-              style={{ 
-                background: "red", 
-                color: "yellow", 
-                border: "2px solid #000", 
-                fontSize: "18px", 
-                fontWeight: "bold", 
-                cursor: "pointer",
-                padding: "5px 20px"
-              }}
-            >
-              CASHIER (CLICK HERE)
-            </button>
-          </div>
-
-          <div style={{ textAlign: "center", fontSize: "10px", marginTop: "40px", color: "#666" }}>
-            <p>Copyright 1998-2005 Haiping Restaurant</p>
-            <p>Best view with Internet Explorer 5.0</p>
-            
-            {/* カウンター風 */}
-            <div style={{ background: "#000", color: "#0f0", display: "inline-block", padding: "2px 5px", fontFamily: "monospace", border: "2px solid #888" }}>
-              0 1 9 3 8 2
+              </ul>
             </div>
+          ))}
+
+          {/* 会計ボタン（中国語） */}
+          <div 
+            onClick={() => setShowBill(true)}
+            onMouseOver={(e) => {e.currentTarget.style.background = "#b00"; e.currentTarget.style.color = "#fff";}}
+            onMouseOut={(e) => {e.currentTarget.style.background = "transparent"; e.currentTarget.style.color = "#b00";}}
+            style={{ 
+              breakInside: "avoid", 
+              marginTop: "20px", 
+              border: "3px solid #b00", 
+              padding: "10px", 
+              textAlign: "center", 
+              fontSize: "14px", 
+              color: "#b00", 
+              fontWeight: "bold", 
+              cursor: "pointer",
+              transition: "0.2s"
+            }}
+          >
+            <p style={{ margin: 0 }}>现金支付 / 拒绝赊账</p>
           </div>
 
-          {/* ★合言葉（裏口）★ */}
-          {/* フッターの著作権表示の横に、背景と同化して置いておく */}
-          <div 
-            onClick={enterBackroom}
-            style={{ 
-              textAlign: "right", 
-              marginTop: "20px", 
-              color: "#FFFFFF", // 背景白なので見えない
-              cursor: "default",
-              fontSize: "12px"
-            }}
-            onMouseOver={(e) => e.currentTarget.style.color = "#FF0000"} // マウスオーバーで赤くなる
-            onMouseOut={(e) => e.currentTarget.style.color = "#FFFFFF"}
-          >
-            歇一歇？
+           <div style={{ breakInside: "avoid", marginTop: "15px", textAlign: "center", fontSize: "10px", color: "#666" }}>
+            <p style={{ margin: 0 }}>本店不承担精神损失</p>
+            <p style={{ margin: 0 }}>有海才开 / 没海不开</p>
+            
+            {/* ★ここが隠しボタンです。「累了就歇一歇（疲れたら休んでいきなよ）」というスローガンに見せかけています。 */}
+            <p 
+              onClick={enterBackroom}
+              style={{ 
+                margin: "5px 0 0 0", 
+                color: "#b00", 
+                fontWeight: "bold", 
+                cursor: "pointer", // あえて普通のポインターにして気づかせない、あるいは default にする
+                display: "inline-block",
+                borderBottom: "1px solid transparent",
+                transition: "border-color 0.3s"
+              }}
+              onMouseOver={(e) => e.currentTarget.style.borderBottom = "1px solid #b00"}
+              onMouseOut={(e) => e.currentTarget.style.borderBottom = "1px solid transparent"}
+            >
+              累了就歇一歇。
+            </p>
           </div>
 
         </div>
       </div>
 
-      {/* --- ポップアップ 1：呪いのスープ（DHTML風） --- */}
+      {/* --- ポップアップ 1: スープ (中国語) --- */}
       {showSoup && (
-        <div style={{ position: "fixed", top: 0, left: 0, width: "100%", height: "100%", background: "rgba(255,255,255,0.0)", display: "flex", justifyContent: "center", alignItems: "center", zIndex: 999 }}>
-          {/* 枠線のみのシンプルな箱 */}
-          <div style={{ 
-            background: "#FFFFCC", 
-            border: "4px solid #FF0000", 
-            width: "300px", 
-            padding: "20px", 
-            textAlign: "center",
-            boxShadow: "10px 10px 0px rgba(0,0,0,0.2)" // 影もベタ塗り
-          }}>
-            <h3 style={{ color: "red", marginTop: 0, textDecoration: "underline" }}>INFORMATION</h3>
-            
-            {/* ドット絵風スープ */}
-            <div style={{ 
-                margin: "15px auto",
-                width: "50px", height: "25px", 
-                background: "#FFD700", 
-                border: "2px solid #000",
-                borderBottomLeftRadius: "25px",
-                borderBottomRightRadius: "25px"
-            }}></div>
-
-            <p style={{ fontWeight: "bold", fontSize: "18px", fontFamily: "'SimSun', serif" }}>
-               鶏汤已经准备好了。
-            </p>
-            <p style={{ fontSize: "12px", color: "#666" }}>
-               (Soup is ready.)
-            </p>
-            
-            <br/>
-            <span 
-              onClick={closeSoup} 
-              style={{ color: "#0000EE", textDecoration: "underline", cursor: "pointer" }}
-            >
-              [ Close Window ]
-            </span>
+        <div onClick={closeSoup} style={{ 
+          position: "fixed", top: 0, left: 0, width: "100%", height: "100%", 
+          background: "rgba(0,0,0,0.6)", zIndex: 100, display: "flex", justifyContent: "center", alignItems: "center"
+        }}>
+          <div style={{ background: "#fff", padding: "20px", border: "4px double #b00", textAlign: "center", maxWidth: "80%" }}>
+            <h3 style={{ color: "#b00", margin: "0 0 10px" }}>本店赠送</h3>
+            <p style={{ fontSize: "14px", fontWeight: "bold" }}>特制老母鸡汤</p>
+            <div style={{ width: "100px", height: "100px", background: "radial-gradient(circle, #fc0, #f80)", borderRadius: "50%", margin: "10px auto", border: "3px solid #fff", boxShadow: "0 0 10px #aaa" }}></div>
+            <p style={{ fontSize: "10px", color: "#888" }}>（点击喝完）</p>
           </div>
         </div>
       )}
 
-      {/* --- ポップアップ 2：お会計（DHTML風） --- */}
+      {/* --- ポップアップ 2: お会計 (中国語) --- */}
       {showBill && (
-        <div style={{ position: "fixed", top: 0, left: 0, width: "100%", height: "100%", background: "rgba(255,255,255,0.0)", display: "flex", justifyContent: "center", alignItems: "center", zIndex: 999 }}>
-          <div style={{ 
-            background: "#FFFFFF", 
-            border: "4px double #000000", 
-            width: "280px", 
-            padding: "20px", 
-            textAlign: "center",
-            boxShadow: "10px 10px 0px #888"
-          }}>
-            <h3 style={{ marginTop: 0 }}>$$ BILL $$</h3>
-            
-            <p>Total:</p>
-            <div style={{ fontSize: "32px", color: "red", fontWeight: "bold", fontFamily: "monospace", border: "1px solid #ccc", background: "#eee", margin: "10px 0" }}>
-              ${total.toFixed(2)}
-            </div>
-            
-            <br/>
-            <button onClick={closeBill}>Pay Now</button>
-            &nbsp;
-            <button onClick={closeBill}>Cancel</button>
+        <div onClick={closeBill} style={{ 
+          position: "fixed", top: 0, left: 0, width: "100%", height: "100%", 
+          background: "rgba(0,0,0,0.8)", zIndex: 101, display: "flex", justifyContent: "center", alignItems: "center"
+        }}>
+          <div style={{ background: "#fff", width: "250px", padding: "20px", fontFamily: "monospace", boxShadow: "0 0 20px #000" }}>
+             <h3 style={{ textAlign: "center", borderBottom: "1px dashed #000", paddingBottom: "10px", margin: 0 }}>收款单</h3>
+             <div style={{ display: "flex", justifyContent: "space-between", margin: "20px 0" }}>
+               <span>总计</span>
+               <span style={{ fontSize: "20px", fontWeight: "bold" }}>${total.toFixed(2)}</span>
+             </div>
+             <p style={{ textAlign: "center", fontSize: "12px", color: "#b00" }}>仅收现金 / 概不赊账</p>
+             <p style={{ textAlign: "center", fontSize: "10px", color: "#ccc", marginTop: "20px" }}>（点击支付）</p>
           </div>
         </div>
       )}
