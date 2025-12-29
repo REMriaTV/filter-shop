@@ -1,10 +1,11 @@
 "use client";
 
 import { useState, useEffect } from 'react';
-// useRouterは使いません（window.location.hrefを使うため）
+import { useRouter } from 'next/navigation';
 import Image from 'next/image';
 
 export default function FakeRestaurant() {
+  const router = useRouter();
   const [total, setTotal] = useState(0);
   const [showSoup, setShowSoup] = useState(false);
   const [showBill, setShowBill] = useState(false);
@@ -13,30 +14,8 @@ export default function FakeRestaurant() {
   const [hasDrunkSoup, setHasDrunkSoup] = useState(false);
   
   // 遷移の進行状況を管理するステート
+  // 0: 通常, 1: 最初の暗転, 2: GIF再生, 3: 強制切断(暗転), 4: 遷移
   const [transitionStage, setTransitionStage] = useState(0);
-
-  // ★★★ 追加：このページにいる間だけ、ブラウザの色を「赤」にする ★★★
-  useEffect(() => {
-    // 既存のmetaタグを探す
-    let metaThemeColor = document.querySelector("meta[name=theme-color]");
-    
-    // なければ作る（安全策）
-    if (!metaThemeColor) {
-      metaThemeColor = document.createElement("meta");
-      metaThemeColor.setAttribute("name", "theme-color");
-      document.head.appendChild(metaThemeColor);
-    }
-
-    // 色を「赤(#b00)」に変更
-    const originalColor = metaThemeColor.getAttribute("content");
-    metaThemeColor.setAttribute("content", "#b00");
-
-    // クリーンアップ：ページを離れる時（アンマウント時）に「黒」に戻す
-    return () => {
-      metaThemeColor.setAttribute("content", "#000000");
-    };
-  }, []);
-  // ★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★★
 
   // 注文処理
   const order = (price) => {
@@ -63,23 +42,27 @@ export default function FakeRestaurant() {
 
   // 遷移処理を開始する関数
   const enterBackroom = () => {
+    // Stage 1: 最初の暗転を開始
     setTransitionStage(1);
   };
 
   // タイムラインの調整
   useEffect(() => {
     if (transitionStage === 1) {
+      // Stage 1 -> 2: 2秒で暗転完了後、黒幕を上げてGIF表示フェーズへ
       setTimeout(() => setTransitionStage(2), 2000);
     } else if (transitionStage === 2) {
+      // Stage 2 -> 3: GIF再生開始。
+      // ★変更：4.0秒で強制切断（文字が出るかなり前）
       setTimeout(() => setTransitionStage(3), 4000); 
     } else if (transitionStage === 3) {
+      // Stage 3 -> 4: 真っ黒のまま2秒間余韻を残す
       setTimeout(() => setTransitionStage(4), 2000);
     } else if (transitionStage === 4) {
-      // 強制リロード遷移
-      // これにより、iOS Safariのキャッシュを無視して新しい設定（黒）を読み込ませます
-      window.location.href = '/reception'; 
+      // Stage 4: ページ遷移実行
+      router.push('/reception');
     }
-  }, [transitionStage]); 
+  }, [transitionStage, router]);
 
 
   // --- メニューデータ ---
@@ -325,8 +308,10 @@ export default function FakeRestaurant() {
       <div style={{
         position: "fixed", top: 0, left: 0, width: "100%", height: "100%",
         backgroundColor: "#000",
+        // Stage 1(最初) または Stage 3(最後) 以降は真っ黒
         opacity: (transitionStage === 1 || transitionStage >= 3) ? 1 : 0,
         pointerEvents: transitionStage !== 0 ? "all" : "none",
+        // Stage 3だけアニメーションなし（0秒）でバサッと切る
         transition: (transitionStage === 3) ? "none" : "opacity 2s ease-in-out", 
         zIndex: 9999 
       }} />
