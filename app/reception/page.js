@@ -99,19 +99,12 @@ export default function Reception() {
   };
 
   return (
-    // ★変更: minHeightを "100dvh" にしてモバイルのアドレスバー対策
-    <main style={{ backgroundColor: "#000", minHeight: "100dvh", padding: "20px", color: "#fff", position: "relative" }}>
+    // ★変更: main自体は最初から不透明(opacity:1)で、背景は黒。これで白飛びを防ぐ。
+    <main style={{ backgroundColor: "#000", minHeight: "100vh", padding: "20px", color: "#fff", position: "relative" }}>
       <style jsx global>{`
-        /* ★追加: ページ全体の背景色を強制的に黒にする */
-        html, body {
-          background-color: #000 !important;
-          margin: 0;
-          padding: 0;
-          overflow-x: hidden;
-        }
-
         @keyframes screenOn { 0% { opacity: 0; filter: brightness(0); } 50% { opacity: 1; filter: brightness(2); } 100% { opacity: 1; filter: brightness(1); } }
         
+        /* ★追加: 黒い幕が徐々に消えるアニメーション */
         @keyframes curtainFadeOut { 
           from { opacity: 1; pointer-events: all; } 
           to { opacity: 0; pointer-events: none; } 
@@ -125,14 +118,13 @@ export default function Reception() {
         }
       `}</style>
 
-      {/* 画面遷移時のフラッシュ防止用「黒い幕」 */}
-      {/* ★変更: heightを "100dvh" にして画面全体を確実に覆う */}
+      {/* ★追加: 画面遷移時のフラッシュ防止用「黒い幕」 */}
       <div style={{
         position: "fixed",
-        top: 0, left: 0, width: "100%", height: "100dvh",
+        top: 0, left: 0, width: "100%", height: "100%",
         backgroundColor: "#000",
         zIndex: 9999, // 最前面
-        animation: "curtainFadeOut 3s ease-out forwards"
+        animation: "curtainFadeOut 3s ease-out forwards" // 3秒かけて黒が消えていく
       }}></div>
 
       <h1 style={{ textAlign: "center", fontFamily: "monospace", opacity: 0.3, marginBottom: "40px", letterSpacing: "5px" }}>
