@@ -87,6 +87,22 @@ const Monitor = ({ index, floorData }) => {
 // --- 受付メイン ---
 export default function Reception() {
   
+  // ★念のためのJS制御（metaタグも黒にする）
+  useEffect(() => {
+    let metaThemeColor = document.querySelector("meta[name=theme-color]");
+    if (!metaThemeColor) {
+      metaThemeColor = document.createElement("meta");
+      metaThemeColor.setAttribute("name", "theme-color");
+      document.head.appendChild(metaThemeColor);
+    }
+    metaThemeColor.setAttribute("content", "#000000");
+    document.body.style.backgroundColor = "#000";
+    
+    return () => {
+      document.body.style.backgroundColor = "";
+    };
+  }, []);
+
   const getMonitorData = (i) => {
     const index = i + 1;
     if (index === 1) return { type: 'link', path: '/floor/ocean', videoId: 'jn4lNAfwD0g' };
@@ -99,32 +115,58 @@ export default function Reception() {
   };
 
   return (
-    // ★変更: main自体は最初から不透明(opacity:1)で、背景は黒。これで白飛びを防ぐ。
-    <main style={{ backgroundColor: "#000", minHeight: "100vh", padding: "20px", color: "#fff", position: "relative" }}>
+    <main style={{ backgroundColor: "#000", minHeight: "100dvh", width: "100vw", padding: "20px", color: "#fff", position: "relative", overflowX: "hidden" }}>
       <style jsx global>{`
+        /* ★重要: 亡霊のような赤いヘッダーをここで強制削除 */
+        header {
+          display: none !important;
+        }
+
+        /* ページ全体を強制的に黒く */
+        html, body {
+          background-color: #000 !important;
+          margin: 0;
+          padding: 0;
+          overscroll-behavior: none;
+        }
+
         @keyframes screenOn { 0% { opacity: 0; filter: brightness(0); } 50% { opacity: 1; filter: brightness(2); } 100% { opacity: 1; filter: brightness(1); } }
         
-        /* ★追加: 黒い幕が徐々に消えるアニメーション */
         @keyframes curtainFadeOut { 
           from { opacity: 1; pointer-events: all; } 
           to { opacity: 0; pointer-events: none; } 
         }
 
+        /* ★モバイル用のコンパクトレイアウト設定 */
         @media (max-width: 768px) {
-          .monitor-container { gap: 8px !important; }
-          .mobile-monitor { width: 48% !important; padding: 8px !important; border-radius: 10px !important; aspect-ratio: 5/4 !important; height: auto !important; }
-          .mobile-screen { height: 75% !important; border-radius: 4px !important; }
-          .monitor-label { margin-top: 4px !important; font-size: 9px !important; }
+          .monitor-container { 
+            gap: 8px !important; 
+          }
+          .mobile-monitor { 
+            width: 48% !important; /* 2列表示 */
+            padding: 8px !important; 
+            border-radius: 10px !important; 
+            aspect-ratio: 5/4 !important; 
+            height: auto !important; 
+          }
+          .mobile-screen { 
+            height: 75% !important; 
+            border-radius: 4px !important; 
+          }
+          .monitor-label { 
+            margin-top: 4px !important; 
+            font-size: 9px !important; 
+          }
         }
       `}</style>
 
-      {/* ★追加: 画面遷移時のフラッシュ防止用「黒い幕」 */}
+      {/* 黒い幕（遷移時のフラッシュ防止） */}
       <div style={{
         position: "fixed",
-        top: 0, left: 0, width: "100%", height: "100%",
+        top: -100, left: 0, width: "100%", height: "200vh",
         backgroundColor: "#000",
-        zIndex: 9999, // 最前面
-        animation: "curtainFadeOut 3s ease-out forwards" // 3秒かけて黒が消えていく
+        zIndex: 9999, 
+        animation: "curtainFadeOut 3s ease-out forwards"
       }}></div>
 
       <h1 style={{ textAlign: "center", fontFamily: "monospace", opacity: 0.3, marginBottom: "40px", letterSpacing: "5px" }}>
