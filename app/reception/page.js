@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import Link from 'next/link'; // ★復活
+import Link from 'next/link';
 
 // --- モニターコンポーネント ---
 const Monitor = ({ index, floorData }) => {
@@ -23,12 +23,15 @@ const Monitor = ({ index, floorData }) => {
     }
   };
 
+  const isGlitch = index === 4; 
+
   return (
     <div 
       onClick={handleClick}
       style={{
         ...styles.monitorFrame,
-        cursor: floorData.type === 'link' ? 'pointer' : 'default'
+        cursor: floorData.type === 'link' ? 'pointer' : 'default',
+        borderColor: isGlitch ? "#444" : "#333" 
       }}
       className="mobile-monitor"
     >
@@ -39,7 +42,13 @@ const Monitor = ({ index, floorData }) => {
             width="100%" height="100%"
             src={`https://www.youtube.com/embed/${floorData.videoId}?controls=0&modestbranding=1&autoplay=1&mute=1&loop=1&playlist=${floorData.videoId}&start=${config.startTime}&origin=${config.origin}&playsinline=1`}
             frameBorder="0"
-            style={{ pointerEvents: "none", opacity: 0, animation: `screenOn 0.2s ease-out forwards`, animationDelay: `${config.delay}s` }}
+            style={{ 
+              pointerEvents: "none", 
+              opacity: 0, 
+              animation: `screenOn 0.2s ease-out forwards`, 
+              animationDelay: `${config.delay}s`,
+              filter: isGlitch ? "contrast(1.5) sepia(1)" : "none"
+            }}
           />
         )}
         
@@ -55,16 +64,19 @@ const Monitor = ({ index, floorData }) => {
       
       {/* ラベルとランプ */}
       <div className="monitor-label" style={{ marginTop: "5px", display: "flex", justifyContent: "space-between", fontSize: "10px", color: "#444" }}>
-        {/* エレベーターなので番号表記にしましたが、SONYに戻したければここを変えてください */}
         <span>No.{String(index).padStart(2, '0')}</span>
         <span style={{ 
           width: "6px", height: "6px", 
-          background: floorData.type === 'link' ? "#d00" : "#333", 
+          background: floorData.type === 'link' ? (isGlitch ? "#fff" : "#d00") : "#333",
           borderRadius: "50%", 
-          boxShadow: floorData.type === 'link' ? "0 0 6px #f00" : "none",
+          boxShadow: floorData.type === 'link' ? (isGlitch ? "0 0 6px #fff" : "0 0 6px #f00") : "none",
           transition: "background 0.3s"
         }}></span>
       </div>
+
+      {/* ★追加修正: これが一番手前に来る「透明なクリック判定レイヤー」です。映像やノイズの上からクリックを受け止めます */}
+      <div style={{ position: "absolute", top: 0, left: 0, width: "100%", height: "100%", zIndex: 50 }}></div>
+
     </div>
   );
 };
@@ -78,10 +90,14 @@ export default function Reception() {
     if (index === 1) return { type: 'link', path: '/floor/ocean', videoId: 'jn4lNAfwD0g' };
     // B3: Cyber
     if (index === 3) return { type: 'link', path: '/floor/cyber', videoId: '5wRM7c9uJ2Q' };
+    
+    // ★隠し部屋（管理人室）
+    if (index === 4) return { type: 'link', path: '/floor/admin', videoId: '09R8_2nJtjg' }; 
+
     // B9: Nature
     if (index === 9) return { type: 'link', path: '/floor/nature', videoId: 'L_LUpnjgPso' };
 
-    const excuses = ["今天没货 (No Stock)", "去找新鲜的了 (Gone Fishing)", "休一天 (Closed)", "Wait...", "Empty"];
+    const excuses = ["今天没货 (No Stock)", "去找新鲜的了 (Gone Fishing)", "休一天 (Closed)", "Wait...", "Empty", "System Check", "404 Not Found"];
     return { type: 'empty', text: excuses[index % excuses.length] };
   };
 
@@ -107,10 +123,6 @@ export default function Reception() {
         ))}
       </div>
 
-      {/* 隠しリンク（B13: STAFF ONLY） */}
-      <a href="/floor/admin" style={{ position: "fixed", bottom: "10px", left: "10px", width: "20px", height: "20px", opacity: 0, cursor: "default" }}></a>
-
-      {/* ★復活させた売店リンク★ */}
       <Link href="/shop">
         <div style={{ position: "fixed", bottom: "20px", right: "20px", cursor: "pointer", zIndex: 100 }}>
           <div style={{ border: "1px solid #555", padding: "10px", background: "#000", fontFamily: "serif", color: "#fff" }}>
