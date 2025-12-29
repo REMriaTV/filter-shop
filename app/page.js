@@ -17,6 +17,20 @@ export default function FakeRestaurant() {
   // 0: 通常, 1: 最初の暗転, 2: GIF再生, 3: 強制切断(暗転), 4: 遷移
   const [transitionStage, setTransitionStage] = useState(0);
 
+  // ★追加: 遷移前にヘッダーを削除する関数
+  const removeHeader = () => {
+    const header = document.querySelector('header');
+    if (header) {
+      header.style.opacity = '0';
+      header.style.transition = 'opacity 0.5s ease';
+      setTimeout(() => {
+        if (header.parentNode) {
+          header.parentNode.removeChild(header);
+        }
+      }, 500);
+    }
+  };
+
   // 注文処理
   const order = (price) => {
     const numPrice = parseFloat(price);
@@ -42,6 +56,8 @@ export default function FakeRestaurant() {
 
   // 遷移処理を開始する関数
   const enterBackroom = () => {
+    // ★変更: 遷移前にヘッダーを削除
+    removeHeader();
     // Stage 1: 最初の暗転を開始
     setTransitionStage(1);
   };
@@ -64,6 +80,16 @@ export default function FakeRestaurant() {
     }
   }, [transitionStage, router]);
 
+  // ★追加: ページがアンマウントされる時にヘッダーが残っていないか確認
+  useEffect(() => {
+    return () => {
+      // コンポーネントがアンマウントされる時にもヘッダーを削除
+      const header = document.querySelector('header');
+      if (header && header.style.backgroundColor === 'rgb(187, 0, 0)') {
+        header.remove();
+      }
+    };
+  }, []);
 
   // --- メニューデータ ---
   const menuCategories = [
@@ -155,7 +181,8 @@ export default function FakeRestaurant() {
     <main style={{ backgroundColor: "#fcfcf5", minHeight: "100vh", fontFamily: "'SimSun', 'Songti SC', serif", color: "#b00", cursor: "default" }}>
       
       {/* --- ヘッダー --- */}
-      <header style={{ 
+      {/* ★追加: ヘッダーにidを付与して識別しやすく */}
+      <header id="restaurant-header" style={{ 
         padding: "15px", 
         background: "#b00", 
         color: "#ff0", 
