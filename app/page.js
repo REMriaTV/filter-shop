@@ -8,6 +8,9 @@ export default function FakeRestaurant() {
   const [total, setTotal] = useState(0);
   const [showSoup, setShowSoup] = useState(false);
   const [showBill, setShowBill] = useState(false);
+  
+  // ★追加：スープを飲み干したかどうかのフラグ
+  const [hasDrunkSoup, setHasDrunkSoup] = useState(false);
 
   // 注文処理
   const order = (price) => {
@@ -18,6 +21,12 @@ export default function FakeRestaurant() {
     }
     // 注文するとスープが出る（おまけ）
     setShowSoup(true);
+  };
+
+  // ★追加：スープを「飲み干す」アクション
+  const drinkSoup = () => {
+    setHasDrunkSoup(true); // 飲み干したフラグを立てる
+    setShowSoup(false);    // ポップアップを閉じる
   };
 
   const closeSoup = () => {
@@ -32,7 +41,7 @@ export default function FakeRestaurant() {
     router.push('/reception');
   };
 
-  // --- メニューデータ（価格の英語も排除） ---
+  // --- メニューデータ ---
   const menuCategories = [
     {
       title: "【凉菜・前菜】",
@@ -78,7 +87,7 @@ export default function FakeRestaurant() {
         { name: "麻婆豆腐", price: "8.0" },
         { name: "地三鲜", price: "12.0" },
         { name: "清炒时蔬", price: "10.0" },
-        { name: "无法挽回的时间", price: "售罄" }, // Sold Out -> 售罄
+        { name: "无法挽回的时间", price: "售罄" }, 
         { name: "番茄炒蛋", price: "10.0" },
         { name: "干煸四季豆", price: "14.0" },
         { name: "酸辣土豆丝", price: "8.0" },
@@ -121,7 +130,7 @@ export default function FakeRestaurant() {
   return (
     <main style={{ backgroundColor: "#fcfcf5", minHeight: "100vh", fontFamily: "'SimSun', 'Songti SC', serif", color: "#b00", cursor: "default" }}>
       
-      {/* --- ヘッダー（完全中国語化） --- */}
+      {/* --- ヘッダー（提供コードのデザインを維持） --- */}
       <header style={{ 
         padding: "15px", 
         background: "#b00", 
@@ -133,7 +142,6 @@ export default function FakeRestaurant() {
         zIndex: 10,
         boxShadow: "0 2px 5px rgba(0,0,0,0.2)"
       }}>
-        {/* 店名変更：大福海平歇一歇 */}
         <h1 style={{ fontSize: "24px", margin: 0, fontWeight: "900", fontFamily: "'SimHei', sans-serif", lineHeight: "1" }}>
           大福海平歇一歇
         </h1>
@@ -174,7 +182,7 @@ export default function FakeRestaurant() {
             </div>
           ))}
 
-          {/* 会計ボタン（中国語） */}
+          {/* 会計ボタン */}
           <div 
             onClick={() => setShowBill(true)}
             onMouseOver={(e) => {e.currentTarget.style.background = "#b00"; e.currentTarget.style.color = "#fff";}}
@@ -195,48 +203,90 @@ export default function FakeRestaurant() {
             <p style={{ margin: 0 }}>现金支付 / 拒绝赊账</p>
           </div>
 
-           <div style={{ breakInside: "avoid", marginTop: "15px", textAlign: "center", fontSize: "10px", color: "#666" }}>
-            <p style={{ margin: 0 }}>本店不承担精神损失</p>
-            <p style={{ margin: 0 }}>有海才开 / 没海不开</p>
+          {/* ★隠しリンクエリア（新しい3行キャッチコピーに変更）★ */}
+           <div style={{ breakInside: "avoid", marginTop: "30px", textAlign: "center", fontSize: "10px", color: "#666", lineHeight: "1.8" }}>
+            {/* 1行目 */}
+            <p style={{ margin: 0 }}>本店，位于海平线附近</p>
             
-            {/* ★ここが隠しボタンです。「累了就歇一歇（疲れたら休んでいきなよ）」というスローガンに見せかけています。 */}
+            {/* 2行目 */}
+            <p style={{ margin: 0 }}>新鲜，从海拔0米开始</p>
+            
+            {/* ★3行目：上と同じデザインにしてカモフラージュ（飲み干すと出現）★ */}
             <p 
-              onClick={enterBackroom}
               style={{ 
-                margin: "5px 0 0 0", 
-                color: "#b00", 
-                fontWeight: "bold", 
-                cursor: "pointer", // あえて普通のポインターにして気づかせない、あるいは default にする
-                display: "inline-block",
-                borderBottom: "1px solid transparent",
-                transition: "border-color 0.3s"
+                margin: 0, 
+                color: "#666", // 上の行と同じ色
+                cursor: hasDrunkSoup ? "pointer" : "default", // 飲み干したらポインターに
+                opacity: hasDrunkSoup ? 1 : 0, 
+                pointerEvents: hasDrunkSoup ? "auto" : "none",
+                // transitionなしでしれっと表示される
               }}
-              onMouseOver={(e) => e.currentTarget.style.borderBottom = "1px solid #b00"}
-              onMouseOut={(e) => e.currentTarget.style.borderBottom = "1px solid transparent"}
+              onClick={enterBackroom}
             >
-              累了就歇一歇。
+              看着海面，歇一歇？
             </p>
           </div>
 
         </div>
       </div>
 
-      {/* --- ポップアップ 1: スープ (中国語) --- */}
+      {/* --- ポップアップ 1: スープ (画像 + 飲み干す機能) --- */}
       {showSoup && (
         <div onClick={closeSoup} style={{ 
           position: "fixed", top: 0, left: 0, width: "100%", height: "100%", 
           background: "rgba(0,0,0,0.6)", zIndex: 100, display: "flex", justifyContent: "center", alignItems: "center"
         }}>
-          <div style={{ background: "#fff", padding: "20px", border: "4px double #b00", textAlign: "center", maxWidth: "80%" }}>
-            <h3 style={{ color: "#b00", margin: "0 0 10px" }}>本店赠送</h3>
-            <p style={{ fontSize: "14px", fontWeight: "bold" }}>特制老母鸡汤</p>
-            <div style={{ width: "100px", height: "100px", background: "radial-gradient(circle, #fc0, #f80)", borderRadius: "50%", margin: "10px auto", border: "3px solid #fff", boxShadow: "0 0 10px #aaa" }}></div>
-            <p style={{ fontSize: "10px", color: "#888" }}>（点击喝完）</p>
+          <div 
+             onClick={(e) => e.stopPropagation()} 
+             style={{ 
+                 background: "#fff", 
+                 padding: "30px", 
+                 border: "4px double #b00", 
+                 textAlign: "center", 
+                 maxWidth: "300px",
+                 boxShadow: "0 0 20px rgba(0,0,0,0.5)"
+             }}
+          >
+            <h3 style={{ color: "#b00", margin: "0 0 15px", fontFamily: "'SimSun', serif", fontSize: "20px", borderBottom: "1px solid #ddd", paddingBottom: "10px" }}>
+                鶏汤已经准备好了。
+            </h3>
+            
+            {/* 画像表示 */}
+            <div style={{ margin: "0 auto 15px" }}>
+                <img 
+                  src="/torisoba_1.png" 
+                  alt="Chicken Soup"
+                  style={{
+                    width: "100%",
+                    maxWidth: "200px",
+                    height: "auto",
+                    display: "block",
+                    margin: "0 auto",
+                    border: "1px solid #ccc",
+                    boxShadow: "2px 2px 5px rgba(0,0,0,0.2)"
+                  }}
+                />
+            </div>
+            
+            {/* 飲み干すボタン */}
+            <div 
+                onClick={drinkSoup}
+                style={{ 
+                    marginTop: "10px", 
+                    cursor: "pointer", 
+                    fontSize: "14px", 
+                    color: "#b00", 
+                    textDecoration: "underline",
+                    fontWeight: "bold"
+                }}
+            >
+                喝完
+            </div>
           </div>
         </div>
       )}
 
-      {/* --- ポップアップ 2: お会計 (中国語) --- */}
+      {/* --- ポップアップ 2: お会計 (通貨を¥に変更) --- */}
       {showBill && (
         <div onClick={closeBill} style={{ 
           position: "fixed", top: 0, left: 0, width: "100%", height: "100%", 
@@ -246,7 +296,8 @@ export default function FakeRestaurant() {
              <h3 style={{ textAlign: "center", borderBottom: "1px dashed #000", paddingBottom: "10px", margin: 0 }}>收款单</h3>
              <div style={{ display: "flex", justifyContent: "space-between", margin: "20px 0" }}>
                <span>总计</span>
-               <span style={{ fontSize: "20px", fontWeight: "bold" }}>${total.toFixed(2)}</span>
+               {/* 通貨を ¥ に変更 */}
+               <span style={{ fontSize: "20px", fontWeight: "bold", color: "#d00" }}>¥{total.toFixed(2)}</span>
              </div>
              <p style={{ textAlign: "center", fontSize: "12px", color: "#b00" }}>仅收现金 / 概不赊账</p>
              <p style={{ textAlign: "center", fontSize: "10px", color: "#ccc", marginTop: "20px" }}>（点击支付）</p>
