@@ -1,23 +1,18 @@
 "use client";
 
 import { useState, useEffect } from 'react';
-import { useRouter } from 'next/navigation';
+// useRouterは使いません
 import Image from 'next/image';
 
 export default function FakeRestaurant() {
-  const router = useRouter();
   const [total, setTotal] = useState(0);
   const [showSoup, setShowSoup] = useState(false);
   const [showBill, setShowBill] = useState(false);
-  
-  // スープを飲み干したかどうかのフラグ
   const [hasDrunkSoup, setHasDrunkSoup] = useState(false);
-  
-  // 遷移の進行状況を管理するステート
-  // 0: 通常, 1: 最初の暗転, 2: GIF再生, 3: 強制切断(暗転), 4: 遷移
   const [transitionStage, setTransitionStage] = useState(0);
 
-  // 注文処理
+  // ★JSでの色操作（useEffect）は削除してください（バグの元です）
+
   const order = (price) => {
     const numPrice = parseFloat(price);
     if (!isNaN(numPrice)) {
@@ -26,7 +21,6 @@ export default function FakeRestaurant() {
     setShowSoup(true);
   };
 
-  // スープを「飲み干す」アクション
   const drinkSoup = () => {
     setHasDrunkSoup(true); 
     setShowSoup(false);    
@@ -40,30 +34,25 @@ export default function FakeRestaurant() {
     setShowBill(false);
   };
 
-  // 遷移処理を開始する関数
   const enterBackroom = () => {
-    // Stage 1: 最初の暗転を開始
     setTransitionStage(1);
   };
 
-  // タイムラインの調整
+  // ★★★ DeepSeekのアドバイスを取り入れた遷移ロジック ★★★
   useEffect(() => {
     if (transitionStage === 1) {
-      // Stage 1 -> 2: 2秒で暗転完了後、黒幕を上げてGIF表示フェーズへ
       setTimeout(() => setTransitionStage(2), 2000);
     } else if (transitionStage === 2) {
-      // Stage 2 -> 3: GIF再生開始。
-      // ★変更：4.0秒で強制切断（文字が出るかなり前）
       setTimeout(() => setTransitionStage(3), 4000); 
     } else if (transitionStage === 3) {
-      // Stage 3 -> 4: 真っ黒のまま2秒間余韻を残す
       setTimeout(() => setTransitionStage(4), 2000);
     } else if (transitionStage === 4) {
-      // Stage 4: ページ遷移実行
-      router.push('/reception');
+      // ★ここがポイント：キャッシュを無視して強制的にページを読み直す
+      setTimeout(() => {
+        window.location.href = '/reception?refresh=' + Date.now();
+      }, 0);
     }
-  }, [transitionStage, router]);
-
+  }, [transitionStage]); 
 
   // --- メニューデータ ---
   const menuCategories = [
@@ -308,10 +297,8 @@ export default function FakeRestaurant() {
       <div style={{
         position: "fixed", top: 0, left: 0, width: "100%", height: "100%",
         backgroundColor: "#000",
-        // Stage 1(最初) または Stage 3(最後) 以降は真っ黒
         opacity: (transitionStage === 1 || transitionStage >= 3) ? 1 : 0,
         pointerEvents: transitionStage !== 0 ? "all" : "none",
-        // Stage 3だけアニメーションなし（0秒）でバサッと切る
         transition: (transitionStage === 3) ? "none" : "opacity 2s ease-in-out", 
         zIndex: 9999 
       }} />
