@@ -1,22 +1,35 @@
 "use client";
 
 import { useState, useEffect } from 'react';
-// import { useRouter } from 'next/navigation'; // ★削除
 import Image from 'next/image';
 
 export default function FakeRestaurant() {
-  // const router = useRouter(); // ★削除
   const [total, setTotal] = useState(0);
   const [showSoup, setShowSoup] = useState(false);
   const [showBill, setShowBill] = useState(false);
-  
-  // スープを飲み干したかどうかのフラグ
   const [hasDrunkSoup, setHasDrunkSoup] = useState(false);
-  
-  // 遷移の進行状況を管理するステート
   const [transitionStage, setTransitionStage] = useState(0);
 
-  // 注文処理
+  // ★追加：このページに来た時だけ、ブラウザのヘッダーを「赤」に書き換える
+  useEffect(() => {
+    // metaタグを探す
+    let metaThemeColor = document.querySelector("meta[name=theme-color]");
+    // なければ作る（念のため）
+    if (!metaThemeColor) {
+      metaThemeColor = document.createElement("meta");
+      metaThemeColor.setAttribute("name", "theme-color");
+      document.head.appendChild(metaThemeColor);
+    }
+    // 赤色に設定
+    metaThemeColor.setAttribute("content", "#b00");
+
+    // クリーンアップ：ページを離れる時に黒に戻す（これ重要）
+    return () => {
+      metaThemeColor.setAttribute("content", "#000000");
+    };
+  }, []);
+  // -----------------------------------------------------------
+
   const order = (price) => {
     const numPrice = parseFloat(price);
     if (!isNaN(numPrice)) {
@@ -25,7 +38,6 @@ export default function FakeRestaurant() {
     setShowSoup(true);
   };
 
-  // スープを「飲み干す」アクション
   const drinkSoup = () => {
     setHasDrunkSoup(true); 
     setShowSoup(false);    
@@ -39,7 +51,6 @@ export default function FakeRestaurant() {
     setShowBill(false);
   };
 
-  // 遷移処理を開始する関数
   const enterBackroom = () => {
     setTransitionStage(1);
   };
@@ -53,8 +64,7 @@ export default function FakeRestaurant() {
     } else if (transitionStage === 3) {
       setTimeout(() => setTransitionStage(4), 2000);
     } else if (transitionStage === 4) {
-      // ★★★ ここを変更！「強制ハード遷移」 ★★★
-      // ブラウザをリロードさせながら移動することで、iOSのヘッダー色変更バグを回避します
+      // 強制ハード遷移（これはそのまま）
       window.location.href = '/reception'; 
     }
   }, [transitionStage]); 
@@ -303,8 +313,10 @@ export default function FakeRestaurant() {
       <div style={{
         position: "fixed", top: 0, left: 0, width: "100%", height: "100%",
         backgroundColor: "#000",
+        // Stage 1(最初) または Stage 3(最後) 以降は真っ黒
         opacity: (transitionStage === 1 || transitionStage >= 3) ? 1 : 0,
         pointerEvents: transitionStage !== 0 ? "all" : "none",
+        // Stage 3だけアニメーションなし（0秒）でバサッと切る
         transition: (transitionStage === 3) ? "none" : "opacity 2s ease-in-out", 
         zIndex: 9999 
       }} />
