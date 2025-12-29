@@ -86,6 +86,23 @@ const Monitor = ({ index, floorData }) => {
 
 // --- 受付メイン ---
 export default function Reception() {
+  const [mounted, setMounted] = useState(false);
+  
+  useEffect(() => {
+    setMounted(true);
+    
+    // ページロード時にbodyのスタイルをリセット
+    document.body.style.backgroundColor = "#000";
+    document.body.style.color = "#fff";
+    document.body.style.fontFamily = "inherit";
+    
+    return () => {
+      // クリーンアップ
+      document.body.style.backgroundColor = "";
+      document.body.style.color = "";
+      document.body.style.fontFamily = "";
+    };
+  }, []);
   
   const getMonitorData = (i) => {
     const index = i + 1;
@@ -99,9 +116,41 @@ export default function Reception() {
   };
 
   return (
-    // ★変更: main自体は最初から不透明(opacity:1)で、背景は黒。これで白飛びを防ぐ。
-    <main style={{ backgroundColor: "#000", minHeight: "100vh", padding: "20px", color: "#fff", position: "relative", width: "100%", overflowX: "hidden" }} className="reception-page">
+    // ★変更: 追加のスタイルを適用
+    <main style={{ 
+      backgroundColor: "#000", 
+      minHeight: "100vh", 
+      padding: "20px", 
+      color: "#fff", 
+      position: "relative", 
+      width: "100%", 
+      overflowX: "hidden",
+      // 追加スタイル
+      margin: 0,
+      fontFamily: "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif",
+      // 確実に黒背景を適用
+      background: "#000 !important"
+    }} className="reception-page">
       <style jsx global>{`
+        /* ページ全体のリセット */
+        html, body {
+          margin: 0;
+          padding: 0;
+          width: 100%;
+          overflow-x: hidden;
+          background-color: #000 !important;
+          color: #fff !important;
+          font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif !important;
+        }
+        
+        /* モニタールーム専用 */
+        .reception-page {
+          all: initial;
+          background-color: #000 !important;
+          color: #fff !important;
+          font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif !important;
+        }
+        
         @keyframes screenOn { 0% { opacity: 0; filter: brightness(0); } 50% { opacity: 1; filter: brightness(2); } 100% { opacity: 1; filter: brightness(1); } }
         
         /* ★追加: 黒い幕が徐々に消えるアニメーション */
@@ -110,32 +159,33 @@ export default function Reception() {
           to { opacity: 0; pointer-events: none; } 
         }
 
+        /* モバイルスタイル */
         @media (max-width: 768px) {
           .reception-monitor-container { gap: 8px !important; }
           .reception-mobile-monitor { width: 48% !important; padding: 8px !important; border-radius: 10px !important; aspect-ratio: 5/4 !important; height: auto !important; }
           .reception-mobile-screen { height: 75% !important; border-radius: 4px !important; }
           .reception-monitor-label { margin-top: 4px !important; font-size: 9px !important; }
           
-          /* モニタールーム固有のリセット */
-          .reception-page {
+          /* トップページのスタイルを完全にリセット */
+          .reception-page header,
+          .reception-page [style*="background: #b00"],
+          .reception-page [style*="background-color: #b00"],
+          .reception-page [style*="color: #ff0"] {
+            display: none !important;
             background-color: #000 !important;
             color: #fff !important;
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif !important;
-          }
-          
-          .reception-page * {
-            box-sizing: border-box;
           }
         }
       `}</style>
 
-      {/* ★追加: 画面遷移時のフラッシュ防止用「黒い幕」 */}
+      {/* ★変更: 黒い幕の改良版 - アニメーション後に完全に非表示 */}
       <div style={{
         position: "fixed",
         top: 0, left: 0, width: "100%", height: "100%",
         backgroundColor: "#000",
-        zIndex: 9999, // 最前面
-        animation: "curtainFadeOut 3s ease-out forwards" // 3秒かけて黒が消えていく
+        zIndex: 9999,
+        animation: "curtainFadeOut 3s ease-out forwards",
+        animationFillMode: "forwards" // アニメーション終了後も状態を維持
       }}></div>
 
       <h1 style={{ textAlign: "center", fontFamily: "monospace", opacity: 0.3, marginBottom: "40px", letterSpacing: "5px" }}>
