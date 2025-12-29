@@ -1,18 +1,37 @@
 "use client";
 
 import { useState, useEffect } from 'react';
-// import { useRouter } from 'next/navigation'; // ★不要になるので削除してもOK
+import { useRouter } from 'next/navigation';
 import Image from 'next/image';
 
-
 export default function FakeRestaurant() {
-  // const router = useRouter(); // ★使わないので削除
+  const router = useRouter();
   const [total, setTotal] = useState(0);
   const [showSoup, setShowSoup] = useState(false);
   const [showBill, setShowBill] = useState(false);
+  
+  // スープを飲み干したかどうかのフラグ
   const [hasDrunkSoup, setHasDrunkSoup] = useState(false);
+  
+  // 遷移の進行状況を管理するステート
+  // 0: 通常, 1: 最初の暗転, 2: GIF再生, 3: 強制切断(暗転), 4: 遷移
   const [transitionStage, setTransitionStage] = useState(0);
 
+  // ★追加: 遷移前にヘッダーを削除する関数
+  const removeHeader = () => {
+    const header = document.querySelector('header');
+    if (header) {
+      header.style.opacity = '0';
+      header.style.transition = 'opacity 0.5s ease';
+      setTimeout(() => {
+        if (header.parentNode) {
+          header.parentNode.removeChild(header);
+        }
+      }, 500);
+    }
+  };
+
+  // 注文処理
   const order = (price) => {
     const numPrice = parseFloat(price);
     if (!isNaN(numPrice)) {
@@ -21,6 +40,7 @@ export default function FakeRestaurant() {
     setShowSoup(true);
   };
 
+  // スープを「飲み干す」アクション
   const drinkSoup = () => {
     setHasDrunkSoup(true); 
     setShowSoup(false);    
@@ -34,26 +54,42 @@ export default function FakeRestaurant() {
     setShowBill(false);
   };
 
+  // 遷移処理を開始する関数
   const enterBackroom = () => {
+    // ★変更: 遷移前にヘッダーを削除
+    removeHeader();
+    // Stage 1: 最初の暗転を開始
     setTransitionStage(1);
   };
 
   // タイムラインの調整
   useEffect(() => {
     if (transitionStage === 1) {
+      // Stage 1 -> 2: 2秒で暗転完了後、黒幕を上げてGIF表示フェーズへ
       setTimeout(() => setTransitionStage(2), 2000);
     } else if (transitionStage === 2) {
+      // Stage 2 -> 3: GIF再生開始。
+      // ★変更：4.0秒で強制切断（文字が出るかなり前）
       setTimeout(() => setTransitionStage(3), 4000); 
     } else if (transitionStage === 3) {
+      // Stage 3 -> 4: 真っ黒のまま2秒間余韻を残す
       setTimeout(() => setTransitionStage(4), 2000);
     } else if (transitionStage === 4) {
-      // ★★★ ここを変更！「最終奥義：強制ハード遷移」 ★★★
-      // router.push ではなく window.location.href を使います。
-      // これによりブラウザは前のページの記憶（赤い色）を完全に捨てて、新しいページをゼロから読み込みます。
-      window.location.href = '/reception'; 
+      // Stage 4: ページ遷移実行
+      router.push('/reception');
     }
-  }, [transitionStage]); // routerは依存配列から外れます
+  }, [transitionStage, router]);
 
+  // ★追加: ページがアンマウントされる時にヘッダーが残っていないか確認
+  useEffect(() => {
+    return () => {
+      // コンポーネントがアンマウントされる時にもヘッダーを削除
+      const header = document.querySelector('header');
+      if (header && header.style.backgroundColor === 'rgb(187, 0, 0)') {
+        header.remove();
+      }
+    };
+  }, []);
 
   // --- メニューデータ ---
   const menuCategories = [
@@ -145,7 +181,8 @@ export default function FakeRestaurant() {
     <main style={{ backgroundColor: "#fcfcf5", minHeight: "100vh", fontFamily: "'SimSun', 'Songti SC', serif", color: "#b00", cursor: "default" }}>
       
       {/* --- ヘッダー --- */}
-      <header style={{ 
+      {/* ★追加: ヘッダーにidを付与して識別しやすく */}
+      <header id="restaurant-header" style={{ 
         padding: "15px", 
         background: "#b00", 
         color: "#ff0", 
