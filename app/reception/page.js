@@ -87,6 +87,14 @@ const Monitor = ({ index, floorData }) => {
 // --- 受付メイン ---
 export default function Reception() {
   
+  // 念のためのバックアップ（bodyクラス操作）
+  useEffect(() => {
+    document.body.style.backgroundColor = "#000";
+    return () => {
+      document.body.style.backgroundColor = "";
+    };
+  }, []);
+
   const getMonitorData = (i) => {
     const index = i + 1;
     if (index === 1) return { type: 'link', path: '/floor/ocean', videoId: 'jn4lNAfwD0g' };
@@ -99,15 +107,14 @@ export default function Reception() {
   };
 
   return (
-    // ★変更: minHeightを "100dvh" にしてモバイルのアドレスバー対策
-    <main style={{ backgroundColor: "#000", minHeight: "100dvh", padding: "20px", color: "#fff", position: "relative" }}>
+    <main style={{ backgroundColor: "#000", minHeight: "100dvh", width: "100vw", padding: "20px", color: "#fff", position: "relative", overflowX: "hidden" }}>
       <style jsx global>{`
-        /* ★追加: ページ全体の背景色を強制的に黒にする */
+        /* ページ全体を強制的に黒く */
         html, body {
           background-color: #000 !important;
           margin: 0;
           padding: 0;
-          overflow-x: hidden;
+          overscroll-behavior: none;
         }
 
         @keyframes screenOn { 0% { opacity: 0; filter: brightness(0); } 50% { opacity: 1; filter: brightness(2); } 100% { opacity: 1; filter: brightness(1); } }
@@ -125,13 +132,12 @@ export default function Reception() {
         }
       `}</style>
 
-      {/* 画面遷移時のフラッシュ防止用「黒い幕」 */}
-      {/* ★変更: heightを "100dvh" にして画面全体を確実に覆う */}
+      {/* 黒い幕 */}
       <div style={{
         position: "fixed",
-        top: 0, left: 0, width: "100%", height: "100dvh",
+        top: -100, left: 0, width: "100%", height: "200vh",
         backgroundColor: "#000",
-        zIndex: 9999, // 最前面
+        zIndex: 9999, 
         animation: "curtainFadeOut 3s ease-out forwards"
       }}></div>
 
