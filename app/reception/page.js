@@ -33,9 +33,9 @@ const Monitor = ({ index, floorData }) => {
         cursor: floorData.type === 'link' ? 'pointer' : 'default',
         borderColor: isGlitch ? "#444" : "#333",
       }}
-      className="reception-mobile-monitor"
+      className="mobile-monitor"
     >
-      <div style={styles.screen} className="reception-mobile-screen">
+      <div style={styles.screen} className="mobile-screen">
         {/* リンクあり（映像） */}
         {floorData.type === 'link' && config.origin && (
           <iframe
@@ -63,7 +63,7 @@ const Monitor = ({ index, floorData }) => {
       </div>
       
       {/* ラベルとランプ */}
-      <div className="reception-monitor-label" style={{ marginTop: "5px", display: "flex", justifyContent: "space-between", fontSize: "10px", color: "#444" }}>
+      <div className="monitor-label" style={{ marginTop: "5px", display: "flex", justifyContent: "space-between", fontSize: "10px", color: "#444" }}>
         <span>No.{String(index).padStart(2, '0')}</span>
         <span style={{ 
           width: "6px", height: "6px", 
@@ -86,24 +86,24 @@ const Monitor = ({ index, floorData }) => {
 
 // --- 受付メイン ---
 export default function Reception() {
-  const [mounted, setMounted] = useState(false);
   
+  // ★追加: コンポーネントがマウントされた瞬間に、ブラウザの背景色設定を強制的に上書きする
   useEffect(() => {
-    setMounted(true);
-    
-    // ページロード時にbodyのスタイルをリセット
+    // html と body の背景色を強制的に黒にする
+    document.documentElement.style.backgroundColor = "#000";
     document.body.style.backgroundColor = "#000";
-    document.body.style.color = "#fff";
-    document.body.style.fontFamily = "inherit";
     
+    // バウンススクロールなどの余計な挙動を一時的に停止
+    document.body.style.overscrollBehavior = "none";
+    document.documentElement.style.overscrollBehavior = "none";
+
+    // クリーンアップ（ページを離れる時に戻すかどうかはお好みですが、今回は黒のままでOK）
     return () => {
-      // クリーンアップ
-      document.body.style.backgroundColor = "";
-      document.body.style.color = "";
-      document.body.style.fontFamily = "";
+      document.body.style.overscrollBehavior = "auto";
+      document.documentElement.style.overscrollBehavior = "auto";
     };
   }, []);
-  
+
   const getMonitorData = (i) => {
     const index = i + 1;
     if (index === 1) return { type: 'link', path: '/floor/ocean', videoId: 'jn4lNAfwD0g' };
@@ -116,83 +116,59 @@ export default function Reception() {
   };
 
   return (
-    // ★変更: 追加のスタイルを適用
-    <main style={{ 
-      backgroundColor: "#000", 
-      minHeight: "100vh", 
-      padding: "20px", 
-      color: "#fff", 
-      position: "relative", 
-      width: "100%", 
-      overflowX: "hidden",
-      // 追加スタイル
-      margin: 0,
-      fontFamily: "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif",
-      // 確実に黒背景を適用
-      background: "#000 !important"
-    }} className="reception-page">
+    // ★変更: minHeight: 100dvh に加え、overscroll-behavior: none をCSSでも指定
+    <main 
+      style={{ 
+        backgroundColor: "#000", 
+        minHeight: "100dvh", 
+        width: "100vw",
+        padding: "20px", 
+        color: "#fff", 
+        position: "relative",
+        overflowX: "hidden" 
+      }} 
+      className="reception-page"
+    >
       <style jsx global>{`
-        /* ページ全体のリセット */
+        /* ★重要: html, body レベルで背景を黒にし、バウンス（引っ張り）を無効化 */
         html, body {
+          background-color: #000 !important;
           margin: 0;
           padding: 0;
-          width: 100%;
-          overflow-x: hidden;
-          background-color: #000 !important;
-          color: #fff !important;
-          font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif !important;
+          overscroll-behavior: none !important; /* スマホで引っ張った時の余白を無効化 */
+          -webkit-overflow-scrolling: touch;
         }
-        
-        /* モニタールーム専用 */
-        .reception-page {
-          all: initial;
-          background-color: #000 !important;
-          color: #fff !important;
-          font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif !important;
-        }
-        
+
         @keyframes screenOn { 0% { opacity: 0; filter: brightness(0); } 50% { opacity: 1; filter: brightness(2); } 100% { opacity: 1; filter: brightness(1); } }
         
-        /* ★追加: 黒い幕が徐々に消えるアニメーション */
         @keyframes curtainFadeOut { 
           from { opacity: 1; pointer-events: all; } 
           to { opacity: 0; pointer-events: none; } 
         }
 
-        /* モバイルスタイル */
         @media (max-width: 768px) {
-          .reception-monitor-container { gap: 8px !important; }
-          .reception-mobile-monitor { width: 48% !important; padding: 8px !important; border-radius: 10px !important; aspect-ratio: 5/4 !important; height: auto !important; }
-          .reception-mobile-screen { height: 75% !important; border-radius: 4px !important; }
-          .reception-monitor-label { margin-top: 4px !important; font-size: 9px !important; }
-          
-          /* トップページのスタイルを完全にリセット */
-          .reception-page header,
-          .reception-page [style*="background: #b00"],
-          .reception-page [style*="background-color: #b00"],
-          .reception-page [style*="color: #ff0"] {
-            display: none !important;
-            background-color: #000 !important;
-            color: #fff !important;
-          }
+          .monitor-container { gap: 8px !important; }
+          .mobile-monitor { width: 48% !important; padding: 8px !important; border-radius: 10px !important; aspect-ratio: 5/4 !important; height: auto !important; }
+          .mobile-screen { height: 75% !important; border-radius: 4px !important; }
+          .monitor-label { margin-top: 4px !important; font-size: 9px !important; }
         }
       `}</style>
 
-      {/* ★変更: 黒い幕の改良版 - アニメーション後に完全に非表示 */}
+      {/* 画面遷移時のフラッシュ防止用「黒い幕」 */}
+      {/* 画面全体を覆うため height: 120vh にして余裕を持たせる */}
       <div style={{
         position: "fixed",
-        top: 0, left: 0, width: "100%", height: "100%",
+        top: -100, left: 0, width: "100%", height: "200vh", // バウンスしても黒が見えるように大きく
         backgroundColor: "#000",
-        zIndex: 9999,
-        animation: "curtainFadeOut 3s ease-out forwards",
-        animationFillMode: "forwards" // アニメーション終了後も状態を維持
+        zIndex: 9999, 
+        animation: "curtainFadeOut 3s ease-out forwards"
       }}></div>
 
       <h1 style={{ textAlign: "center", fontFamily: "monospace", opacity: 0.3, marginBottom: "40px", letterSpacing: "5px" }}>
         FILTER SHOP B.P.O
       </h1>
       
-      <div className="reception-monitor-container" style={{ display: "flex", flexWrap: "wrap", gap: "20px", justifyContent: "center" }}>
+      <div className="monitor-container" style={{ display: "flex", flexWrap: "wrap", gap: "20px", justifyContent: "center" }}>
         {Array.from({ length: 12 }).map((_, i) => (
           <Monitor key={i} index={i + 1} floorData={getMonitorData(i)} />
         ))}
