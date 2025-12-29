@@ -87,52 +87,6 @@ const Monitor = ({ index, floorData }) => {
 // --- 受付メイン ---
 export default function Reception() {
   
-  // ★追加: ページマウント時に残っているヘッダーを削除
-  useEffect(() => {
-    // トップページのヘッダーが残っていたら削除
-    const restaurantHeader = document.getElementById('restaurant-header');
-    if (restaurantHeader) {
-      restaurantHeader.remove();
-    }
-    
-    // または、背景が赤いヘッダーをすべて削除
-    const headers = document.querySelectorAll('header');
-    headers.forEach(header => {
-      const bgColor = window.getComputedStyle(header).backgroundColor;
-      if (bgColor === 'rgb(187, 0, 0)' || bgColor === '#b00') {
-        header.remove();
-      }
-    });
-    
-    // bodyの背景色を確実に黒に設定
-    document.body.style.backgroundColor = '#000';
-    document.body.style.color = '#fff';
-    document.documentElement.style.backgroundColor = '#000';
-    
-    // スクロール位置をトップにリセット
-    window.scrollTo(0, 0);
-    
-    // 定期的にチェックして残っている赤い要素を削除（保険）
-    const cleanupInterval = setInterval(() => {
-      document.querySelectorAll('*').forEach(element => {
-        const style = window.getComputedStyle(element);
-        if (style.backgroundColor === 'rgb(187, 0, 0)' || 
-            style.backgroundColor === '#b00' ||
-            style.color === 'rgb(255, 255, 0)' ||
-            style.color === '#ff0') {
-          if (element.tagName !== 'BODY' && element.tagName !== 'HTML') {
-            element.style.display = 'none';
-            element.style.visibility = 'hidden';
-          }
-        }
-      });
-    }, 100);
-    
-    return () => {
-      clearInterval(cleanupInterval);
-    };
-  }, []);
-
   const getMonitorData = (i) => {
     const index = i + 1;
     if (index === 1) return { type: 'link', path: '/floor/ocean', videoId: 'jn4lNAfwD0g' };
@@ -146,37 +100,14 @@ export default function Reception() {
 
   return (
     // ★変更: minHeightを "100dvh" にしてモバイルのアドレスバー対策
-    <main style={{ 
-      backgroundColor: "#000", 
-      minHeight: "100dvh", 
-      width: "100%",
-      padding: "20px", 
-      color: "#fff", 
-      position: "relative",
-      overflowX: "hidden"
-    }}>
+    <main style={{ backgroundColor: "#000", minHeight: "100dvh", padding: "20px", color: "#fff", position: "relative" }}>
       <style jsx global>{`
         /* ★追加: ページ全体の背景色を強制的に黒にする */
         html, body {
           background-color: #000 !important;
-          margin: 0 !important;
-          padding: 0 !important;
-          overflow-x: hidden !important;
-          width: 100% !important;
-          height: 100% !important;
-        }
-        
-        /* トップページのヘッダーを確実に非表示 */
-        #restaurant-header,
-        header[style*="background: #b00"],
-        header[style*="background-color: #b00"] {
-          display: none !important;
-          visibility: hidden !important;
-          height: 0 !important;
-          width: 0 !important;
-          position: absolute !important;
-          pointer-events: none !important;
-          opacity: 0 !important;
+          margin: 0;
+          padding: 0;
+          overflow-x: hidden;
         }
 
         @keyframes screenOn { 0% { opacity: 0; filter: brightness(0); } 50% { opacity: 1; filter: brightness(2); } 100% { opacity: 1; filter: brightness(1); } }
