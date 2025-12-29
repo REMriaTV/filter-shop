@@ -87,21 +87,6 @@ const Monitor = ({ index, floorData }) => {
 // --- 受付メイン ---
 export default function Reception() {
   
-  // ページがマウントされた時にクラスを追加し、globals.cssのスタイルを適用させる
-  useEffect(() => {
-    // bodyに専用クラスを追加
-    document.body.classList.add('reception-page');
-    
-    // 念のためJS側でも背景を黒に固定
-    document.body.style.backgroundColor = "#000";
-    
-    // ページを離れるときにクラスを削除（クリーンアップ）
-    return () => {
-      document.body.classList.remove('reception-page');
-      document.body.style.backgroundColor = ""; // 元に戻す
-    };
-  }, []);
-
   const getMonitorData = (i) => {
     const index = i + 1;
     if (index === 1) return { type: 'link', path: '/floor/ocean', videoId: 'jn4lNAfwD0g' };
@@ -114,19 +99,17 @@ export default function Reception() {
   };
 
   return (
-    <main 
-      style={{ 
-        backgroundColor: "#000", 
-        minHeight: "100dvh", 
-        width: "100vw",
-        padding: "20px", 
-        color: "#fff", 
-        position: "relative",
-        overflowX: "hidden"
-      }} 
-      className="reception-page"
-    >
+    // ★変更: minHeightを "100dvh" にしてモバイルのアドレスバー対策
+    <main style={{ backgroundColor: "#000", minHeight: "100dvh", padding: "20px", color: "#fff", position: "relative" }}>
       <style jsx global>{`
+        /* ★追加: ページ全体の背景色を強制的に黒にする */
+        html, body {
+          background-color: #000 !important;
+          margin: 0;
+          padding: 0;
+          overflow-x: hidden;
+        }
+
         @keyframes screenOn { 0% { opacity: 0; filter: brightness(0); } 50% { opacity: 1; filter: brightness(2); } 100% { opacity: 1; filter: brightness(1); } }
         
         @keyframes curtainFadeOut { 
@@ -143,11 +126,12 @@ export default function Reception() {
       `}</style>
 
       {/* 画面遷移時のフラッシュ防止用「黒い幕」 */}
+      {/* ★変更: heightを "100dvh" にして画面全体を確実に覆う */}
       <div style={{
         position: "fixed",
-        top: -100, left: 0, width: "100%", height: "200vh",
+        top: 0, left: 0, width: "100%", height: "100dvh",
         backgroundColor: "#000",
-        zIndex: 9999, 
+        zIndex: 9999, // 最前面
         animation: "curtainFadeOut 3s ease-out forwards"
       }}></div>
 
