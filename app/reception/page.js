@@ -33,9 +33,9 @@ const Monitor = ({ index, floorData }) => {
         cursor: floorData.type === 'link' ? 'pointer' : 'default',
         borderColor: isGlitch ? "#444" : "#333",
       }}
-      className="mobile-monitor"
+      className="reception-mobile-monitor"
     >
-      <div style={styles.screen} className="mobile-screen">
+      <div style={styles.screen} className="reception-mobile-screen">
         {/* リンクあり（映像） */}
         {floorData.type === 'link' && config.origin && (
           <iframe
@@ -63,7 +63,7 @@ const Monitor = ({ index, floorData }) => {
       </div>
       
       {/* ラベルとランプ */}
-      <div className="monitor-label" style={{ marginTop: "5px", display: "flex", justifyContent: "space-between", fontSize: "10px", color: "#444" }}>
+      <div className="reception-monitor-label" style={{ marginTop: "5px", display: "flex", justifyContent: "space-between", fontSize: "10px", color: "#444" }}>
         <span>No.{String(index).padStart(2, '0')}</span>
         <span style={{ 
           width: "6px", height: "6px", 
@@ -99,47 +99,50 @@ export default function Reception() {
   };
 
   return (
-    // ★変更: minHeightを "100dvh" にしてモバイルのアドレスバー対策
-    <main style={{ backgroundColor: "#000", minHeight: "100dvh", padding: "20px", color: "#fff", position: "relative" }}>
+    // ★変更: main自体は最初から不透明(opacity:1)で、背景は黒。これで白飛びを防ぐ。
+    <main style={{ backgroundColor: "#000", minHeight: "100vh", padding: "20px", color: "#fff", position: "relative", width: "100%", overflowX: "hidden" }} className="reception-page">
       <style jsx global>{`
-        /* ★追加: ページ全体の背景色を強制的に黒にする */
-        html, body {
-          background-color: #000 !important;
-          margin: 0;
-          padding: 0;
-          overflow-x: hidden;
-        }
-
         @keyframes screenOn { 0% { opacity: 0; filter: brightness(0); } 50% { opacity: 1; filter: brightness(2); } 100% { opacity: 1; filter: brightness(1); } }
         
+        /* ★追加: 黒い幕が徐々に消えるアニメーション */
         @keyframes curtainFadeOut { 
           from { opacity: 1; pointer-events: all; } 
           to { opacity: 0; pointer-events: none; } 
         }
 
         @media (max-width: 768px) {
-          .monitor-container { gap: 8px !important; }
-          .mobile-monitor { width: 48% !important; padding: 8px !important; border-radius: 10px !important; aspect-ratio: 5/4 !important; height: auto !important; }
-          .mobile-screen { height: 75% !important; border-radius: 4px !important; }
-          .monitor-label { margin-top: 4px !important; font-size: 9px !important; }
+          .reception-monitor-container { gap: 8px !important; }
+          .reception-mobile-monitor { width: 48% !important; padding: 8px !important; border-radius: 10px !important; aspect-ratio: 5/4 !important; height: auto !important; }
+          .reception-mobile-screen { height: 75% !important; border-radius: 4px !important; }
+          .reception-monitor-label { margin-top: 4px !important; font-size: 9px !important; }
+          
+          /* モニタールーム固有のリセット */
+          .reception-page {
+            background-color: #000 !important;
+            color: #fff !important;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif !important;
+          }
+          
+          .reception-page * {
+            box-sizing: border-box;
+          }
         }
       `}</style>
 
-      {/* 画面遷移時のフラッシュ防止用「黒い幕」 */}
-      {/* ★変更: heightを "100dvh" にして画面全体を確実に覆う */}
+      {/* ★追加: 画面遷移時のフラッシュ防止用「黒い幕」 */}
       <div style={{
         position: "fixed",
-        top: 0, left: 0, width: "100%", height: "100dvh",
+        top: 0, left: 0, width: "100%", height: "100%",
         backgroundColor: "#000",
         zIndex: 9999, // 最前面
-        animation: "curtainFadeOut 3s ease-out forwards"
+        animation: "curtainFadeOut 3s ease-out forwards" // 3秒かけて黒が消えていく
       }}></div>
 
       <h1 style={{ textAlign: "center", fontFamily: "monospace", opacity: 0.3, marginBottom: "40px", letterSpacing: "5px" }}>
         FILTER SHOP B.P.O
       </h1>
       
-      <div className="monitor-container" style={{ display: "flex", flexWrap: "wrap", gap: "20px", justifyContent: "center" }}>
+      <div className="reception-monitor-container" style={{ display: "flex", flexWrap: "wrap", gap: "20px", justifyContent: "center" }}>
         {Array.from({ length: 12 }).map((_, i) => (
           <Monitor key={i} index={i + 1} floorData={getMonitorData(i)} />
         ))}

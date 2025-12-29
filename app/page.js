@@ -152,7 +152,7 @@ export default function FakeRestaurant() {
   ];
 
   return (
-    <main style={{ backgroundColor: "#fcfcf5", minHeight: "100vh", fontFamily: "'SimSun', 'Songti SC', serif", color: "#b00", cursor: "default" }}>
+    <main style={{ backgroundColor: "#fcfcf5", minHeight: "100vh", fontFamily: "'SimSun', 'Songti SC', serif", color: "#b00", cursor: "default" }} className="restaurant-page">
       
       {/* --- ヘッダー --- */}
       <header style={{ 
