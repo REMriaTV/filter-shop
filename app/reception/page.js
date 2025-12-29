@@ -87,18 +87,18 @@ const Monitor = ({ index, floorData }) => {
 // --- 受付メイン ---
 export default function Reception() {
   
-  // ページがマウントされた時に確実にbodyにクラスを追加
+  // ページがマウントされた時にクラスを追加し、globals.cssのスタイルを適用させる
   useEffect(() => {
-    // bodyにクラスを追加
+    // bodyに専用クラスを追加
     document.body.classList.add('reception-page');
     
-    // 念のためスタイルも設定
+    // 念のためJS側でも背景を黒に固定
     document.body.style.backgroundColor = "#000";
-    document.body.style.color = "#fff";
     
-    // ページを離れるときにクラスを削除
+    // ページを離れるときにクラスを削除（クリーンアップ）
     return () => {
       document.body.classList.remove('reception-page');
+      document.body.style.backgroundColor = ""; // 元に戻す
     };
   }, []);
 
